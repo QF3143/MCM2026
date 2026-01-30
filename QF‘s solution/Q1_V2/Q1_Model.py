@@ -194,13 +194,20 @@ def simulate_week(week_df, rule_type, rounds, zipf_s):
     # 结果聚合
     if not valid_shares:
         return None
-        
-    valid_shares = np.array(valid_shares)
+    
+    #95%置信区间提取开始
+    valid_shares_arr = np.array(valid_shares)
+    # 计算 2.5% 和 97.5% 分位数作为 95% 置信区间
+    ci_low = np.percentile(valid_shares_arr, 2.5, axis=0)
+    ci_high = np.percentile(valid_shares_arr, 97.5, axis=0)
+    
     return pd.DataFrame({
         'Contestant': contestants,
-        'Est_Fan_Share': np.mean(valid_shares, axis=0),
-        'Fan_Share_Std': np.std(valid_shares, axis=0),
-        'Valid_Simulations': len(valid_shares),
+        'Est_Fan_Share': np.mean(valid_shares_arr, axis=0),
+        'Fan_Share_CI_Lower': ci_low,
+        'Fan_Share_CI_Upper': ci_high,
+        'Fan_Share_Std': np.std(valid_shares_arr, axis=0),
+        'Valid_Simulations': len(valid_shares_arr),
         'IsFinalWeek': is_final_week
     })
 

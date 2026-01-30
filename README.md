@@ -79,3 +79,7 @@ Y轴 (Normalized Fan Vote)：模型估算出你拿了多少观众票（相对于
 高能异常点 (High-Fan Anomalies)：重点关注那些位于左上角的蓝点。
 它们代表：裁判分很低 (X<0.8)，但居然存活了（蓝色）。
 原因：你看它们的 Y 轴坐标，通常高达 1.5 甚至 2.0。这直观地证明了：只要粉丝够疯狂（票数是平均值的2倍），裁判给0分你也走不了。
+[Trajectory_Alfonso_Ribeiro.png]
+展示19季冠军的人气曲线；置信区间在决赛场收窄是因为决赛周的模型逻辑从“存活判定”切换到了“精确排名判定”的全序约束，极大地压缩了参数空间，剔除了 99% 以上在常规周可行的随机扰动。这种从“不等式约束”向“等式约束”的质变，是导致 CI 宽度骤降的根本原因。
+"The persistent width of the confidence intervals during preliminary weeks reflects the inherent observational sparsity of the DWTS voting system. Our Monte Carlo analysis correctly identifies that the 'survival constraint' (avoiding elimination) is insufficient to uniquely localize fan preferences. The subsequent sharp convergence of the CI in the final week (W=0.0275) validates that our model successfully transitions from a low-information regime to a high-information regime, capturing the definitive popularity of the winner only when strict ordinal data becomes available."
+

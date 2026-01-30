@@ -136,6 +136,27 @@ def plot_normalized_frontier():
     
     print("图表已生成：Normalized_Survival_Frontier.png")
 
+def plot_contestant_trajectory(season, name, path):
+    df = pd.read_csv(path)
+    data = df[(df['Season'] == season) & (df['Contestant'] == name)].sort_values('Week')
+    
+    plt.figure(figsize=(10, 5))
+    plt.plot(data['Week'], data['Est_Fan_Share'], 'o-', color='#e74c3c', label='Mean Estimate')
+    
+    # 填充 95% 置信区间
+    plt.fill_between(data['Week'], 
+                     data['Fan_Share_CI_Lower'], 
+                     data['Fan_Share_CI_Upper'], 
+                     color='#e74c3c', alpha=0.2, label='95% Confidence Interval')
+    
+    plt.xlabel('Week Number')
+    plt.ylabel('Estimated Fan Share ($P_{fan}$)')
+    plt.title(f'Fan Share Trajectory for {name} (Season {season})')
+    plt.legend()
+    plt.grid(True, linestyle=':', alpha=0.6)
+    plt.tight_layout()
+    plt.savefig(f'Trajectory_{name.replace(" ", "_")}.png')
+    
 # 运行绘图函数
 if __name__ == "__main__":
-    plot_normalized_frontier()
+    plot_contestant_trajectory(19, "Alfonso Ribeiro", "QF‘s solution/Q1_V2/Problem_C_Solution_Advanced.csv")
