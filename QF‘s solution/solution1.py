@@ -143,7 +143,7 @@ class InverseFanVoteEstimator:
             
             # Inner Optimization Loop (Iterative fitting for current week)
             # "Repeat until X reaches a satisfactory threshold"
-            for i in range(50): 
+            for i in range(500): 
                 # Extract current priors
                 current_priors = self.normalize(self.X[global_idx])
                 
@@ -177,7 +177,13 @@ class InverseFanVoteEstimator:
 
 # --- Execution ---
 # Assuming the file is in the current directory
-estimator = InverseFanVoteEstimator('/Users/liuqiufan/Documents/SJTU_Local/MCM2026/QF‘s solution/2026_MCM_Problem_C/2026_MCM_Problem_C_Data.csv', season_id=5)
+# ==================================================
+# 超参数设置
+
+season = 5
+# ==================================================
+
+estimator = InverseFanVoteEstimator('/home/xskxsjwjz/MCM2026/2026_MCM_Problem_C_Data.csv', season_id=season)
 results = estimator.run()
 # --- 将 results 输出为 CSV ---
 import os
@@ -197,11 +203,11 @@ for week_data in results:
 output_df = pd.DataFrame(output_rows)
 
 # 确保输出目录存在（可选）
-output_dir = "/Users/liuqiufan/Documents/SJTU_Local/MCM2026/QF‘s solution/2026_MCM_Problem_C/"
+output_dir = "./QF‘s solution"
 os.makedirs(output_dir, exist_ok=True)
 
 # 保存为 CSV
-output_path = os.path.join(output_dir, f"season5_fan_support_estimates.csv")
+output_path = os.path.join(output_dir, f"season{season}_fan_support_estimates.csv")
 output_df.to_csv(output_path, index=False)
 
 print(f"\n✅ Estimated fan support saved to: {output_path}")
