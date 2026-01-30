@@ -1,1 +1,5 @@
 .sii
+**/__pycache__
+**/figures
+
+*.csv
