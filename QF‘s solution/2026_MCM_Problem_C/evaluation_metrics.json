@@ -1,0 +1,437 @@
+[
+  {
+    "week": 1,
+    "consistency_index": 0.9973499999999997,
+    "contestants": {
+      "Cameron Mathison": {
+        "mean_vote": 0.0833190540604612,
+        "certainty_score": 1.7613627243034657e-07,
+        "cv": 2.1139975053309143e-06
+      },
+      "Jane Seymour": {
+        "mean_vote": 0.0833190540604612,
+        "certainty_score": 1.7613627243034657e-07,
+        "cv": 2.1139975053309143e-06
+      },
+      "Sabrina Bryan": {
+        "mean_vote": 0.0833190540604612,
+        "certainty_score": 1.7613627243034657e-07,
+        "cv": 2.1139975053309143e-06
+      },
+      "Jennie Garth": {
+        "mean_vote": 0.0833190540604612,
+        "certainty_score": 1.7613627243034657e-07,
+        "cv": 2.1139975053309143e-06
+      },
+      "Floyd Mayweather Jr. ": {
+        "mean_vote": 0.08699364361833017,
+        "certainty_score": 3.189232744787887e-05,
+        "cv": 0.00036660526127404243
+      },
+      "Josie Maran": {
+        "mean_vote": 0.07923307591564312,
+        "certainty_score": 2.167195260242781e-05,
+        "cv": 0.00027352153569679957
+      },
+      "Albert Reed": {
+        "mean_vote": 0.0833190540604612,
+        "certainty_score": 1.7613627243034657e-07,
+        "cv": 2.1139975053309143e-06
+      },
+      "Helio Castroneves": {
+        "mean_vote": 0.0833190540604612,
+        "certainty_score": 1.7613627243034657e-07,
+        "cv": 2.1139975053309143e-06
+      },
+      "Mel B": {
+        "mean_vote": 0.0833190540604612,
+        "certainty_score": 1.7613627243034657e-07,
+        "cv": 2.1139975053309143e-06
+      },
+      "Wayne Newton": {
+        "mean_vote": 0.08390179392187594,
+        "certainty_score": 2.6675667004029464e-05,
+        "cv": 0.0003179391733729575
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.0833190540604612,
+        "certainty_score": 1.7613627243034657e-07,
+        "cv": 2.1139975053309143e-06
+      },
+      "Mark Cuban": {
+        "mean_vote": 0.0833190540604612,
+        "certainty_score": 1.7613627243034657e-07,
+        "cv": 2.1139975053309143e-06
+      }
+    }
+  },
+  {
+    "week": 2,
+    "consistency_index": 0.9972999999999999,
+    "contestants": {
+      "Cameron Mathison": {
+        "mean_vote": 0.08906473570040314,
+        "certainty_score": 5.716351700277479e-06,
+        "cv": 6.418198690339351e-05
+      },
+      "Jane Seymour": {
+        "mean_vote": 0.09282462404949346,
+        "certainty_score": 2.1487032660546748e-06,
+        "cv": 2.31479878109606e-05
+      },
+      "Sabrina Bryan": {
+        "mean_vote": 0.09533463030870927,
+        "certainty_score": 2.2038642717380476e-06,
+        "cv": 2.3117142895520455e-05
+      },
+      "Jennie Garth": {
+        "mean_vote": 0.0890633997051188,
+        "certainty_score": 3.562455776530002e-06,
+        "cv": 3.999909938678497e-05
+      },
+      "Floyd Mayweather Jr. ": {
+        "mean_vote": 0.08807677236189748,
+        "certainty_score": 2.32883110194617e-05,
+        "cv": 0.0002644092238504457
+      },
+      "Albert Reed": {
+        "mean_vote": 0.06668687179586082,
+        "certainty_score": 2.008711592550438e-05,
+        "cv": 0.00030121544742710765
+      },
+      "Helio Castroneves": {
+        "mean_vote": 0.09407962717910137,
+        "certainty_score": 2.176283533968217e-06,
+        "cv": 2.313235712366483e-05
+      },
+      "Mel B": {
+        "mean_vote": 0.09282462404949346,
+        "certainty_score": 2.1487032660546748e-06,
+        "cv": 2.31479878109606e-05
+      },
+      "Wayne Newton": {
+        "mean_vote": 0.10828093229440769,
+        "certainty_score": 4.285703386115451e-05,
+        "cv": 0.0003957948362009801
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.08905961466066976,
+        "certainty_score": 2.0659654695554103e-06,
+        "cv": 2.3197556798634744e-05
+      },
+      "Mark Cuban": {
+        "mean_vote": 0.09470416789484475,
+        "certainty_score": 4.129829342735481e-05,
+        "cv": 0.0004360768310979785
+      }
+    }
+  },
+  {
+    "week": 3,
+    "consistency_index": 0.9976499999999999,
+    "contestants": {
+      "Cameron Mathison": {
+        "mean_vote": 0.09585361025459918,
+        "certainty_score": 1.515062697623564e-05,
+        "cv": 0.00015806005570362638
+      },
+      "Jane Seymour": {
+        "mean_vote": 0.09866300250758364,
+        "certainty_score": 2.774421965170962e-06,
+        "cv": 2.8120185831134713e-05
+      },
+      "Sabrina Bryan": {
+        "mean_vote": 0.10735841951790878,
+        "certainty_score": 2.9294045245633775e-06,
+        "cv": 2.7286211344371687e-05
+      },
+      "Jennie Garth": {
+        "mean_vote": 0.09582241465370492,
+        "certainty_score": 3.3704083543614357e-06,
+        "cv": 3.517348593793885e-05
+      },
+      "Floyd Mayweather Jr. ": {
+        "mean_vote": 0.0983141116319495,
+        "certainty_score": 5.113989160646005e-05,
+        "cv": 0.0005201683741791644
+      },
+      "Helio Castroneves": {
+        "mean_vote": 0.10777056125352942,
+        "certainty_score": 2.9166331441851793e-06,
+        "cv": 2.7063356729894188e-05
+      },
+      "Mel B": {
+        "mean_vote": 0.10138291693088833,
+        "certainty_score": 2.8112415924418217e-06,
+        "cv": 2.7728947613119236e-05
+      },
+      "Wayne Newton": {
+        "mean_vote": 0.09246858098647197,
+        "certainty_score": 3.274028167069133e-05,
+        "cv": 0.0003540692559722658
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.09989942771444559,
+        "certainty_score": 2.7356785673028822e-06,
+        "cv": 2.7384326716291083e-05
+      },
+      "Mark Cuban": {
+        "mean_vote": 0.10246695454891866,
+        "certainty_score": 4.627184417811326e-05,
+        "cv": 0.0004515782125253138
+      }
+    }
+  },
+  {
+    "week": 4,
+    "consistency_index": 0.9975999999999999,
+    "contestants": {
+      "Cameron Mathison": {
+        "mean_vote": 0.1050244513751947,
+        "certainty_score": 1.1924973007615836e-05,
+        "cv": 0.00011354473031251032
+      },
+      "Jane Seymour": {
+        "mean_vote": 0.11267136716693686,
+        "certainty_score": 4.104802410561302e-06,
+        "cv": 3.643163754709321e-05
+      },
+      "Sabrina Bryan": {
+        "mean_vote": 0.11933257902275432,
+        "certainty_score": 4.346970110752423e-06,
+        "cv": 3.642735409182386e-05
+      },
+      "Jennie Garth": {
+        "mean_vote": 0.10912161805237372,
+        "certainty_score": 3.60121429966378e-06,
+        "cv": 3.300184110114048e-05
+      },
+      "Floyd Mayweather Jr. ": {
+        "mean_vote": 0.09372174591897105,
+        "certainty_score": 3.825873618699117e-05,
+        "cv": 0.00040821621291678136
+      },
+      "Helio Castroneves": {
+        "mean_vote": 0.1155272399638907,
+        "certainty_score": 4.252679955458447e-06,
+        "cv": 3.6811058212657626e-05
+      },
+      "Mel B": {
+        "mean_vote": 0.11475498502924972,
+        "certainty_score": 4.17482066944094e-06,
+        "cv": 3.6380299020359127e-05
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.11224485503035246,
+        "certainty_score": 4.077321293669742e-06,
+        "cv": 3.6325239963713093e-05
+      },
+      "Mark Cuban": {
+        "mean_vote": 0.1176011584402765,
+        "certainty_score": 4.786826187891927e-05,
+        "cv": 0.000407039033575754
+      }
+    }
+  },
+  {
+    "week": 5,
+    "consistency_index": 0.99795,
+    "contestants": {
+      "Cameron Mathison": {
+        "mean_vote": 0.11938044533679851,
+        "certainty_score": 1.0440999835386562e-05,
+        "cv": 8.745988345017649e-05
+      },
+      "Jane Seymour": {
+        "mean_vote": 0.1238737496418801,
+        "certainty_score": 4.516945798353041e-06,
+        "cv": 3.6464108105321456e-05
+      },
+      "Sabrina Bryan": {
+        "mean_vote": 0.1346831875581269,
+        "certainty_score": 4.862925552734955e-06,
+        "cv": 3.610640378284931e-05
+      },
+      "Jennie Garth": {
+        "mean_vote": 0.12255659681484518,
+        "certainty_score": 8.548900614472944e-06,
+        "cv": 6.975471607936671e-05
+      },
+      "Helio Castroneves": {
+        "mean_vote": 0.12785227262837764,
+        "certainty_score": 3.9883519860773926e-05,
+        "cv": 0.00031195002670544257
+      },
+      "Mel B": {
+        "mean_vote": 0.1254839866467638,
+        "certainty_score": 4.583187187793376e-06,
+        "cv": 3.652408016566292e-05
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.1345394457268126,
+        "certainty_score": 5.263115895917942e-05,
+        "cv": 0.000391195003627776
+      },
+      "Mark Cuban": {
+        "mean_vote": 0.11163031564639517,
+        "certainty_score": 4.764734713174715e-05,
+        "cv": 0.0004268316080255194
+      }
+    }
+  },
+  {
+    "week": 6,
+    "consistency_index": 0.9975999999999999,
+    "contestants": {
+      "Cameron Mathison": {
+        "mean_vote": 0.1429172147574225,
+        "certainty_score": 8.761322654128633e-05,
+        "cv": 0.0006130348026302835
+      },
+      "Jane Seymour": {
+        "mean_vote": 0.16034647323148002,
+        "certainty_score": 8.855787744976077e-05,
+        "cv": 0.0005522907717584564
+      },
+      "Sabrina Bryan": {
+        "mean_vote": 0.11737031301711771,
+        "certainty_score": 3.7092903776749027e-05,
+        "cv": 0.0003160330991989368
+      },
+      "Jennie Garth": {
+        "mean_vote": 0.1384795310244993,
+        "certainty_score": 2.8682350403674664e-05,
+        "cv": 0.0002071233935548228
+      },
+      "Helio Castroneves": {
+        "mean_vote": 0.1391135372526015,
+        "certainty_score": 2.9713997144016434e-05,
+        "cv": 0.00021359529583423603
+      },
+      "Mel B": {
+        "mean_vote": 0.1473870763594271,
+        "certainty_score": 6.889699503168573e-06,
+        "cv": 4.6745614835095394e-05
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.1543858543574519,
+        "certainty_score": 8.137425044957915e-05,
+        "cv": 0.000527083590580599
+      }
+    }
+  },
+  {
+    "week": 7,
+    "consistency_index": 0.99725,
+    "contestants": {
+      "Cameron Mathison": {
+        "mean_vote": 0.17271516105793186,
+        "certainty_score": 7.721564969457383e-05,
+        "cv": 0.0004470693205020622
+      },
+      "Jane Seymour": {
+        "mean_vote": 0.1456643208201326,
+        "certainty_score": 3.0229036307365878e-05,
+        "cv": 0.00020752533041150771
+      },
+      "Jennie Garth": {
+        "mean_vote": 0.16654417275126027,
+        "certainty_score": 6.196613938042129e-05,
+        "cv": 0.0003720702943655072
+      },
+      "Helio Castroneves": {
+        "mean_vote": 0.16988690212390115,
+        "certainty_score": 8.324937665639648e-05,
+        "cv": 0.0004900282223975185
+      },
+      "Mel B": {
+        "mean_vote": 0.17466656187256274,
+        "certainty_score": 2.2850324088408826e-05,
+        "cv": 0.00013082254464412307
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.1705228813742114,
+        "certainty_score": 7.847874138602012e-05,
+        "cv": 0.00046022411041600345
+      }
+    }
+  },
+  {
+    "week": 8,
+    "consistency_index": 0.9967,
+    "contestants": {
+      "Cameron Mathison": {
+        "mean_vote": 0.17100655791108274,
+        "certainty_score": 7.077846619448202e-05,
+        "cv": 0.0004138932860766911
+      },
+      "Jennie Garth": {
+        "mean_vote": 0.21110989754987472,
+        "certainty_score": 0.00010509120773643423,
+        "cv": 0.0004978033192953752
+      },
+      "Helio Castroneves": {
+        "mean_vote": 0.1982676974370624,
+        "certainty_score": 6.591300473746742e-05,
+        "cv": 0.0003324444959491734
+      },
+      "Mel B": {
+        "mean_vote": 0.2044089750009111,
+        "certainty_score": 2.4791560091974712e-05,
+        "cv": 0.00012128410747064413
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.215206872101069,
+        "certainty_score": 0.00010313574979463104,
+        "cv": 0.0004792400390736348
+      }
+    }
+  },
+  {
+    "week": 9,
+    "consistency_index": 0.9974500000000001,
+    "contestants": {
+      "Jennie Garth": {
+        "mean_vote": 0.21744460378809688,
+        "certainty_score": 8.577921217583804e-05,
+        "cv": 0.00039448765654093306
+      },
+      "Helio Castroneves": {
+        "mean_vote": 0.254829670358505,
+        "certainty_score": 9.692168525682092e-05,
+        "cv": 0.0003803390912858281
+      },
+      "Mel B": {
+        "mean_vote": 0.25574733641253,
+        "certainty_score": 0.00011500132917826706,
+        "cv": 0.00044966774939452593
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.27197838944086816,
+        "certainty_score": 9.37681894543878e-05,
+        "cv": 0.0003447633822935564
+      }
+    }
+  },
+  {
+    "week": 10,
+    "consistency_index": 1.0,
+    "contestants": {
+      "Helio Castroneves": {
+        "mean_vote": 0.3134308878674542,
+        "certainty_score": 0.000280923929387067,
+        "cv": 0.0008962866783757
+      },
+      "Mel B": {
+        "mean_vote": 0.3089594426822879,
+        "certainty_score": 0.0002585053960340262,
+        "cv": 0.0008366968615354957
+      },
+      "Marie Osmond": {
+        "mean_vote": 0.37760966945025787,
+        "certainty_score": 0.00030144471311265806,
+        "cv": 0.0007982971239892126
+      }
+    }
+  }
+]
