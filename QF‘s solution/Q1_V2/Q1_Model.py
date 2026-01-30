@@ -232,11 +232,5 @@ def run_solver(filepath):
 if __name__ == "__main__":
     out = run_solver('2026_MCM_Problem_C_Data.csv')
     if not out.empty:
-        out.to_csv('Problem_C_Solution_Advanced.csv', index=False)
+        out.to_csv('QF‘s solution/Q1_V2/Problem_C_Solution_Advanced.csv', index=False)
         print("\nOptimization Complete.")
-        
-        # 打印一个决赛周的例子看看
-        finals = out[out['IsFinalWeek'] == True]
-        if not finals.empty:
-            print("\nSample Finals Prediction (S32):")
-            print(finals[finals['Season'] == 32][['Contestant', 'Est_Fan_Share', 'Fan_Share_Std']])
