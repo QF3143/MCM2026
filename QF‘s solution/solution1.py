@@ -177,5 +177,31 @@ class InverseFanVoteEstimator:
 
 # --- Execution ---
 # Assuming the file is in the current directory
-estimator = InverseFanVoteEstimator('2026_MCM_Problem_C_Data.csv', season_id=5)
+estimator = InverseFanVoteEstimator('/Users/liuqiufan/Documents/SJTU_Local/MCM2026/QF‘s solution/2026_MCM_Problem_C/2026_MCM_Problem_C_Data.csv', season_id=5)
 results = estimator.run()
+# --- 将 results 输出为 CSV ---
+import os
+
+# 准备输出数据
+output_rows = []
+for week_data in results:
+    week = week_data["week"]
+    for name, fan_prob in week_data["X"].items():
+        output_rows.append({
+            "week": week,
+            "celebrity_name": name,
+            "estimated_fan_support": fan_prob
+        })
+
+# 转为 DataFrame
+output_df = pd.DataFrame(output_rows)
+
+# 确保输出目录存在（可选）
+output_dir = "/Users/liuqiufan/Documents/SJTU_Local/MCM2026/QF‘s solution/2026_MCM_Problem_C/"
+os.makedirs(output_dir, exist_ok=True)
+
+# 保存为 CSV
+output_path = os.path.join(output_dir, f"season5_fan_support_estimates.csv")
+output_df.to_csv(output_path, index=False)
+
+print(f"\n✅ Estimated fan support saved to: {output_path}")
