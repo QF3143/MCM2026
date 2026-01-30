@@ -1,0 +1,281 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{born2006}{article}{}
+      \name{author}{2}{}{%
+        {{hash=36257c851181b04303bc6b2260165cdc}{%
+           family={Born},
+           familyi={B\bibinitperiod},
+           given={Patricia},
+           giveni={P\bibinitperiod}}}%
+        {{hash=840df9f6bf566f73714cff78d3a45cf1}{%
+           family={Viscusi},
+           familyi={V\bibinitperiod},
+           given={W\bibnamedelima Kip},
+           giveni={W\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{965a55a5541f082ec1500aa6845f789f}
+      \strng{fullhash}{965a55a5541f082ec1500aa6845f789f}
+      \strng{bibnamehash}{965a55a5541f082ec1500aa6845f789f}
+      \strng{authorbibnamehash}{965a55a5541f082ec1500aa6845f789f}
+      \strng{authornamehash}{965a55a5541f082ec1500aa6845f789f}
+      \strng{authorfullhash}{965a55a5541f082ec1500aa6845f789f}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Risk and Uncertainty}
+      \field{number}{1/2}
+      \field{title}{The catastrophic effects of natural disasters on insurance markets}
+      \field{volume}{33}
+      \field{year}{2006}
+      \field{pages}{55\bibrangedash 72}
+      \range{pages}{18}
+    \endentry
+    \entry{li2002}{article}{}
+      \name{author}{2}{}{%
+        {{hash=7ed006f859ebac6ff5c9dd727a07ccd3}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Bingqing},
+           giveni={B\bibinitperiod}}}%
+        {{hash=f24f2e674186a8b8d899e1818540d7bd}{%
+           family={Tian},
+           familyi={T\bibinitperiod},
+           given={Cunzhi},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{f734563b1056617c887dbb7172d33b8d}
+      \strng{fullhash}{f734563b1056617c887dbb7172d33b8d}
+      \strng{bibnamehash}{f734563b1056617c887dbb7172d33b8d}
+      \strng{authorbibnamehash}{f734563b1056617c887dbb7172d33b8d}
+      \strng{authornamehash}{f734563b1056617c887dbb7172d33b8d}
+      \strng{authorfullhash}{f734563b1056617c887dbb7172d33b8d}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Nankai Economic Research}
+      \field{number}{4}
+      \field{title}{Application of {CAPM} in pricing catastrophe insurance products}
+      \field{year}{2002}
+      \field{pages}{41\bibrangedash 103}
+      \range{pages}{63}
+    \endentry
+    \entry{jaffee1997}{article}{}
+      \name{author}{2}{}{%
+        {{hash=20db0fee49c801524008afc4408df5e2}{%
+           family={Jaffee},
+           familyi={J\bibinitperiod},
+           given={Dwight},
+           giveni={D\bibinitperiod}}}%
+        {{hash=46da6d240baf99638456ec3a40cb94c3}{%
+           family={Russell},
+           familyi={R\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Wiley Online Library}%
+      }
+      \strng{namehash}{8035aa31e6165f4302477be2b9f59af5}
+      \strng{fullhash}{8035aa31e6165f4302477be2b9f59af5}
+      \strng{bibnamehash}{8035aa31e6165f4302477be2b9f59af5}
+      \strng{authorbibnamehash}{8035aa31e6165f4302477be2b9f59af5}
+      \strng{authornamehash}{8035aa31e6165f4302477be2b9f59af5}
+      \strng{authorfullhash}{8035aa31e6165f4302477be2b9f59af5}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Risk and Insurance}
+      \field{number}{2}
+      \field{title}{Catastrophe insurance, capital markets, and uninsurable risks}
+      \field{volume}{64}
+      \field{year}{1997}
+      \field{pages}{205\bibrangedash 230}
+      \range{pages}{26}
+    \endentry
+    \entry{froot1999}{report}{}
+      \name{author}{1}{}{%
+        {{hash=0d306ea69aed0b69615aafa3809cb56b}{%
+           family={Froot},
+           familyi={F\bibinitperiod},
+           given={Kenneth\bibnamedelima A},
+           giveni={K\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {National Bureau of Economic Research}%
+      }
+      \list{location}{1}{%
+        {Cambridge, MA}%
+      }
+      \strng{namehash}{0d306ea69aed0b69615aafa3809cb56b}
+      \strng{fullhash}{0d306ea69aed0b69615aafa3809cb56b}
+      \strng{bibnamehash}{0d306ea69aed0b69615aafa3809cb56b}
+      \strng{authorbibnamehash}{0d306ea69aed0b69615aafa3809cb56b}
+      \strng{authornamehash}{0d306ea69aed0b69615aafa3809cb56b}
+      \strng{authorfullhash}{0d306ea69aed0b69615aafa3809cb56b}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{The financing of catastrophe risk}
+      \field{type}{techreport}
+      \field{year}{1999}
+    \endentry
+    \entry{michel2011}{article}{}
+      \name{author}{2}{}{%
+        {{hash=c89cd2c0160bf53c8f9a280ec0971a23}{%
+           family={Michel-Kerjan},
+           familyi={M\bibinithyphendelim K\bibinitperiod},
+           given={Erwann},
+           giveni={E\bibinitperiod}}}%
+        {{hash=93ad4b5f967da99a5c1493f023b3f360}{%
+           family={Kunreuther},
+           familyi={K\bibinitperiod},
+           given={Howard},
+           giveni={H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {American Association for the Advancement of Science}%
+      }
+      \strng{namehash}{5e0d3cb2f3d44e6c212085622904c52a}
+      \strng{fullhash}{5e0d3cb2f3d44e6c212085622904c52a}
+      \strng{bibnamehash}{5e0d3cb2f3d44e6c212085622904c52a}
+      \strng{authorbibnamehash}{5e0d3cb2f3d44e6c212085622904c52a}
+      \strng{authornamehash}{5e0d3cb2f3d44e6c212085622904c52a}
+      \strng{authorfullhash}{5e0d3cb2f3d44e6c212085622904c52a}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Science}
+      \field{number}{6041}
+      \field{title}{Redesigning flood insurance}
+      \field{volume}{333}
+      \field{year}{2011}
+      \field{pages}{408\bibrangedash 409}
+      \range{pages}{2}
+    \endentry
+    \entry{aase1992}{article}{}
+      \name{author}{1}{}{%
+        {{hash=22b0a185adc76de7e119101db6d6c651}{%
+           family={Aase},
+           familyi={A\bibinitperiod},
+           given={Knut\bibnamedelima K},
+           giveni={K\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{22b0a185adc76de7e119101db6d6c651}
+      \strng{fullhash}{22b0a185adc76de7e119101db6d6c651}
+      \strng{bibnamehash}{22b0a185adc76de7e119101db6d6c651}
+      \strng{authorbibnamehash}{22b0a185adc76de7e119101db6d6c651}
+      \strng{authornamehash}{22b0a185adc76de7e119101db6d6c651}
+      \strng{authorfullhash}{22b0a185adc76de7e119101db6d6c651}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The Geneva Papers on Risk and Insurance Theory}
+      \field{title}{Dynamic equilibrium and the structure of premiums in a reinsurance market}
+      \field{volume}{17}
+      \field{year}{1992}
+      \field{pages}{93\bibrangedash 136}
+      \range{pages}{44}
+    \endentry
+    \entry{blanchard1994}{article}{}
+      \name{author}{3}{}{%
+        {{hash=8ea1d54fee57ba07b648601ddd77664a}{%
+           family={Blanchard},
+           familyi={B\bibinitperiod},
+           given={Olivier},
+           giveni={O\bibinitperiod}}}%
+        {{hash=283ec0c71a4f949044672542ceb681c0}{%
+           family={Lopez-de-Silanes},
+           familyi={L\bibinithyphendelim S\bibinitperiod},
+           given={Florencio},
+           giveni={F\bibinitperiod}}}%
+        {{hash=73d7bf2d3105674f373111fc7356eec3}{%
+           family={Shleifer},
+           familyi={S\bibinitperiod},
+           given={Andrei},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{bf97e256548eb96fea79541c0d8606af}
+      \strng{fullhash}{bf97e256548eb96fea79541c0d8606af}
+      \strng{bibnamehash}{bf97e256548eb96fea79541c0d8606af}
+      \strng{authorbibnamehash}{bf97e256548eb96fea79541c0d8606af}
+      \strng{authornamehash}{bf97e256548eb96fea79541c0d8606af}
+      \strng{authorfullhash}{bf97e256548eb96fea79541c0d8606af}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Financial Economics}
+      \field{number}{3}
+      \field{title}{What do firms do with cash windfalls?}
+      \field{volume}{36}
+      \field{year}{1994}
+      \field{pages}{337\bibrangedash 360}
+      \range{pages}{24}
+    \endentry
+    \entry{chatgpt2024}{online}{}
+      \name{author}{1}{}{%
+        {{hash=0523b13262b12c215d8009938f5c14f1}{%
+           family={{OpenAI}},
+           familyi={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{fullhash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{bibnamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorbibnamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authornamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorfullhash}{0523b13262b12c215d8009938f5c14f1}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{ChatGPT: Optimizing Language Models for Dialogue}
+      \field{urlday}{8}
+      \field{urlmonth}{1}
+      \field{urlyear}{2024}
+      \field{year}{2024}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://openai.com/chatgpt
+      \endverb
+      \verb{url}
+      \verb https://openai.com/chatgpt
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
