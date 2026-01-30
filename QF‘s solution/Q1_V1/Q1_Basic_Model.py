@@ -25,7 +25,7 @@ class InverseFanVoteEstimator:
         week_cols = [c for c in self.season_data.columns if 'week' in c and 'judge' in c]
         weeks = [int(c.split('week')[1].split('_')[0]) for c in week_cols]
         self.max_data_week = max(weeks) if weeks else 0
-        print(f"ℹ️ Season {season_id}: Max data week detected = {self.max_data_week}")
+        print(f"Season {season_id}: Max data week detected = {self.max_data_week}")
 
     def normalize(self, v):
         return v / np.sum(v)
