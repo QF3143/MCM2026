@@ -146,7 +146,7 @@ class InverseFanVoteEstimator:
             
             # Optimization Loop (Only if there is someone to eliminate)
             if len(elim_idx) > 0:
-                for i in range(500): 
+                for i in range(50): 
                     current_priors = self.normalize(self.X[global_idx])
                     probs = self.simulate_step(judges, current_priors)
                     self.update_parameters(global_idx, probs, elim_idx)
@@ -190,5 +190,5 @@ if __name__ == "__main__":
     # 强制只看分数：如果某人 Week 10 有分，Week 11 没分，那他就是在 Week 10 没的。
     # 如果所有人在 Week 11 也没分，那就说明 Week 10 是最后一舞。
     season = 1
-    m = "percent"
-    estimate_season_datadriven(season, '2026_MCM_Problem_C_Data.csv', f'{season}_{m}_datadriven.csv', method=m)
+    m = "rank"
+    estimate_season_datadriven(season, '2026_MCM_Problem_C_Data.csv', f'/Users/liuqiufan/Documents/SJTU_Local/MCM2026/QF‘s solution/Q1_result/{season}_{m}_datadriven.csv', method=m)
