@@ -427,9 +427,6 @@ class BayesianEloEstimator:
         self._total_simulations += self.n_simulations
         
         prob_death = death_counts / self.n_simulations
-        prob_death += 1e-9
-        prob_death= prob_death / np.sum(prob_death)
-        
         loser_idx = np.where(names == loser_name)[0][0]
         
         # 1. 一致性: 模型预测与实际淘汰的吻合度
@@ -448,7 +445,7 @@ class BayesianEloEstimator:
         n_boot = 500
         boot_probs = np.zeros(n_boot)
         for b in range(n_boot):
-            boot_counts = np.random.multinomial(self.n_simulations, prob_death)
+            boot_counts = np.random.multinomial(self.n_simulations, prob_death + 1e-9)
             boot_probs[b] = boot_counts[loser_idx] / self.n_simulations
         ci_lower = np.percentile(boot_probs, 2.5)
         ci_upper = np.percentile(boot_probs, 97.5)
@@ -456,12 +453,12 @@ class BayesianEloEstimator:
         # 4. KL 散度 (与均匀分布的距离)
         uniform = np.ones(n) / n
         if NUMBA_AVAILABLE:
-            kl_div = _compute_kl_divergence(prob_death, uniform)
+            kl_div = _compute_kl_divergence(prob_death + 1e-9, uniform)
         else:
-            kl_div = np.sum((prob_death) * np.log((prob_death) / uniform))
+            kl_div = np.sum((prob_death + 1e-9) * np.log((prob_death + 1e-9) / uniform))
         
         # 5. 有效样本量 (ESS)
-        ess = 1.0 / np.sum(prob_death ** 2)
+        ess = 1.0 / np.sum(prob_death ** 2 + 1e-9)
         
         # 保存分布用于可视化
         self.weekly_distributions.append({
@@ -1157,9 +1154,9 @@ def main():
     # 初始化模型
     estimator = BayesianEloEstimator(
         base_k_factor=48.0,
-        temperature=300.0,
+        temperature=100.0,
         n_simulations=3000,
-        noise_std=0.15,
+        noise_std=0.10,
         judge_weight=0.5,
         rd_decay=0.95,
         use_adaptive_params=True,
