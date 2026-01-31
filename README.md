@@ -154,3 +154,32 @@ Y (目标): Estimated_Fan_Votes (需标准化，如取对数 log1p，因为票�
 年龄的双重效应 (The Age Paradox)
 年龄（及年龄平方）在两个模型中的重要性都排在第2、3位（合计约38%-41%）。差异：年龄对粉丝的影响权重（合计 41.3%）竟然略高于对裁判的影响（合计 38.0%）。通常认为裁判会惩罚高龄选手的僵硬，但数据显示粉丝对年龄非常敏感。结合SHAP分析，这可能意味着粉丝不仅会投票给年轻偶像，也会对高龄励志选手表现出强烈的情感偏好（Sympathy Vote），或者反过来，极其排斥某些年龄段。行业影响微弱,行业特征（Industry）的整体贡献度较低，说明“你是谁（演员/运动员）”不如“你表现得怎么样（舞伴/年龄状态）”重要。
 Divergent Age Dynamics. The blue dashed line illustrates a steep technical penalty for older contestants from judges. In contrast, the orange solid line reveals that fan support remains relatively resilient for older demographics, decoupling popularity from physical performance decline.
+
+## Q4
+> Propose another system using fan votes and judge scores each week that you believe is more
+“fair” (or “better” in some other way such as making the show more exciting for the fans).
+Provide support for why your approach should be adopted by the show producers.
+>
+> 使用每周的粉丝投票和评委评分数据来设计另一个你认为更“公平”的评分系统（或者在某些方面更“好”，比如让节目对粉丝而言更精彩）。提供支持你观点的理由，说明为什么你的方法应该被节目制作人采纳。
+
+[] 尚未实现代码
+
+解决这个问题要关注多方面因素：
+
+1. 公平性：相信评委专业性，始终确保评委评分占大头，粉丝投票作为节目效果不应过分影响结果；
+2. 趣味性：粉丝投票能影响结果，留下人气选手/引发争议增加节目热度；
+
+目前的计分方案：
+
+- 采用带权重的双对数形式：
+  $$ total\_score=judge\_pct+0.2\cdot\frac{\ln(1+fan\_pct)}{\ln(1+\max(fan\_pct))} $$
+
+理由：
+
+1. **公平**。评委评分占比极大，保证专业性，粉丝投票经过对数压缩，避免人气过分影响结果；
+2. **趣味**。粉丝投票有影响力，能够挽救人气选手维持热度；
+
+其他额外方案：
+
+- **突然死亡**：每周统计总分后选出垫底的两个选手，进行淘汰对决，由评委和粉丝重新投票计算总分。
+- **进步奖励**：每周计算每个选手的评委评分与上周的差值，进步最大的选手本次粉丝投票得分权重变为0.3；

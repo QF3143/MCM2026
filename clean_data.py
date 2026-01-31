@@ -85,10 +85,11 @@ def clean_dwts_data(file_path):
     
     # 5. 计算每一周的排名 (Rank Share)
     # 这是第二问对比算法的输入
-    cleaned_df['judge_rank'] = cleaned_df.groupby(['season', 'week'])['avg_score'].rank(ascending=False)
+    cleaned_df['judge_rank'] = cleaned_df.groupby(['season', 'week'])['avg_score'].rank(ascending=False, method='min')
     
     return cleaned_df
 
 # 使用方法
 df_final = clean_dwts_data('2026_MCM_Problem_C_Data.csv')
+df_final = df_final.sort_values(['season', 'week', 'avg_score'], ascending=[True, True, False]).reset_index(drop=True)
 df_final.to_csv('cleaned_weekly_data.csv', index=False)
