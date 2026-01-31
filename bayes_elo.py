@@ -79,7 +79,7 @@ def _latin_hypercube_sample(n_samples: int, n_dims: int) -> np.ndarray:
     return result
 
 
-@njit(cache=True, fastmath=True, parallel=True)
+@njit(cache=False, fastmath=True)
 def _stratified_monte_carlo(
     j_pct: np.ndarray, 
     f_pct: np.ndarray, 
@@ -90,66 +90,62 @@ def _stratified_monte_carlo(
     """
     分层蒙特卡洛模拟 - 返回淘汰计数和总分分布
     使用抗方差技术提高估计精度
+    注意: 移除并行以避免数据竞争
     """
     n = len(j_pct)
     death_counts = np.zeros(n, dtype=np.float64)
     score_sums = np.zeros(n, dtype=np.float64)
-    score_sq_sums = np.zeros(n, dtype=np.float64)
     
-    # 使用分层采样
-    strata = n_sim // 10
+    for sim in range(n_sim):
+        # 生成抗方差噪声对 (antithetic variates)
+        noise = np.empty(n)
+        anti_noise = np.empty(n)
+        for i in range(n):
+            z = np.random.randn()
+            noise[i] = 1.0 + z * noise_std
+            anti_noise[i] = 1.0 - z * noise_std  # 对称噪声
+        
+        # 正向模拟
+        sim_f = f_pct * noise
+        sim_sum = 0.0
+        for i in range(n):
+            sim_sum += sim_f[i]
+        if sim_sum > 1e-9:
+            for i in range(n):
+                sim_f[i] /= sim_sum
+        
+        # 加权总分 - 正向
+        min_total = judge_weight * j_pct[0] + (1 - judge_weight) * sim_f[0]
+        min_idx = 0
+        for i in range(n):
+            total = judge_weight * j_pct[i] + (1 - judge_weight) * sim_f[i]
+            score_sums[i] += total
+            if total < min_total:
+                min_total = total
+                min_idx = i
+        death_counts[min_idx] += 0.5
+        
+        # 反向模拟 (抗方差)
+        sim_f_anti = f_pct * anti_noise
+        sim_sum = 0.0
+        for i in range(n):
+            sim_sum += sim_f_anti[i]
+        if sim_sum > 1e-9:
+            for i in range(n):
+                sim_f_anti[i] /= sim_sum
+        
+        # 加权总分 - 反向
+        min_total = judge_weight * j_pct[0] + (1 - judge_weight) * sim_f_anti[0]
+        min_idx = 0
+        for i in range(n):
+            total = judge_weight * j_pct[i] + (1 - judge_weight) * sim_f_anti[i]
+            score_sums[i] += total
+            if total < min_total:
+                min_total = total
+                min_idx = i
+        death_counts[min_idx] += 0.5
     
-    for stratum in range(10):
-        for sim in prange(strata):
-            # 生成抗方差噪声对 (antithetic variates)
-            noise = np.empty(n)
-            anti_noise = np.empty(n)
-            for i in range(n):
-                z = np.random.randn()
-                noise[i] = 1.0 + z * noise_std
-                anti_noise[i] = 1.0 - z * noise_std  # 对称噪声
-            
-            # 正向模拟
-            sim_f = f_pct * noise
-            sim_sum = 0.0
-            for i in range(n):
-                sim_sum += sim_f[i]
-            if sim_sum > 1e-9:
-                for i in range(n):
-                    sim_f[i] /= sim_sum
-            
-            # 加权总分
-            min_total = judge_weight * j_pct[0] + (1 - judge_weight) * sim_f[0]
-            min_idx = 0
-            for i in range(n):
-                total = judge_weight * j_pct[i] + (1 - judge_weight) * sim_f[i]
-                score_sums[i] += total
-                score_sq_sums[i] += total * total
-                if i > 0 and total < min_total:
-                    min_total = total
-                    min_idx = i
-            death_counts[min_idx] += 0.5
-            
-            # 反向模拟 (抗方差)
-            sim_f_anti = f_pct * anti_noise
-            sim_sum = 0.0
-            for i in range(n):
-                sim_sum += sim_f_anti[i]
-            if sim_sum > 1e-9:
-                for i in range(n):
-                    sim_f_anti[i] /= sim_sum
-            
-            min_total = judge_weight * j_pct[0] + (1 - judge_weight) * sim_f_anti[0]
-            min_idx = 0
-            for i in range(n):
-                total = judge_weight * j_pct[i] + (1 - judge_weight) * sim_f_anti[i]
-                score_sums[i] += total
-                score_sq_sums[i] += total * total
-                if i > 0 and total < min_total:
-                    min_total = total
-                    min_idx = i
-            death_counts[min_idx] += 0.5
-    
+    # 返回平均分 (每个模拟有正向和反向两次)
     return death_counts, score_sums / (n_sim * 2)
 
 
@@ -315,10 +311,10 @@ class BayesianEloEstimator:
     def __init__(
         self,
         base_k_factor: float = 48.0,
-        temperature: float = 100.0,
+        temperature: float = 150.0,
         n_simulations: int = 3000,
-        noise_std: float = 0.10,
-        judge_weight: float = 0.5,
+        noise_std: float = 0.30,
+        judge_weight: float = 0.4,
         rd_decay: float = 0.95,
         use_adaptive_params: bool = True,
         memory_decay: float = 0.92
@@ -383,15 +379,15 @@ class BayesianEloEstimator:
         progress = week / total_weeks
         
         # 温度: 后期降低 (分布更集中)
-        temperature = self.base_temperature * (1.0 - 0.4 * progress)
+        temperature = self.base_temperature * (1.0 - 0.3 * progress)
         
-        # 噪声: 人少时降低 (投票更确定)
-        contestant_factor = min(1.0, n_contestants / 12.0)
-        noise_std = self.noise_std * (0.6 + 0.4 * contestant_factor)
+        # 噪声: 人少时保持较高 (投票更不确定)
+        contestant_factor = min(1.0, n_contestants / 10.0)
+        noise_std = self.noise_std * (0.8 + 0.4 * contestant_factor)
         
         # 评委权重: 后期略增 (专业性更重要)
-        judge_weight = self.judge_weight + 0.1 * progress
-        judge_weight = min(0.7, judge_weight)
+        judge_weight = self.judge_weight + 0.15 * progress
+        judge_weight = min(0.6, judge_weight)
         
         return temperature, noise_std, judge_weight
     
@@ -411,19 +407,43 @@ class BayesianEloEstimator:
         
         if not loser_name or loser_name not in names:
             return {
-                'consistency': 1.0, 'certainty': 1.0,
-                'ci_lower': 1.0, 'ci_upper': 1.0,
-                'kl_divergence': 0.0, 'effective_sample_size': float(self.n_simulations)
+                'consistency': np.nan, 'certainty': np.nan,
+                'ci_lower': np.nan, 'ci_upper': np.nan,
+                'kl_divergence': np.nan, 'effective_sample_size': float(self.n_simulations)
             }
         
-        # 执行分层蒙特卡洛模拟
+        # 输入校验与规范化: 确保是非负且和为1的比例分布
+        j_pct = j_pct.astype(np.float64)
+        f_pct = f_pct.astype(np.float64)
+        # 处理异常值
+        if not np.isfinite(j_pct).all() or (j_pct < 0).any() or j_pct.sum() <= 0:
+            # 退化为均匀分布
+            j_pct = np.ones(len(names), dtype=np.float64) / len(names)
+        else:
+            j_pct = j_pct / j_pct.sum()
+        if not np.isfinite(f_pct).all() or (f_pct < 0).any() or f_pct.sum() <= 0:
+            f_pct = np.ones(len(names), dtype=np.float64) / len(names)
+        else:
+            f_pct = f_pct / f_pct.sum()
+
+        # 执行分层蒙特卡洛模拟 (优先使用配置的后端)
         death_counts, avg_scores = self._mc_func(
-            j_pct.astype(np.float64),
-            f_pct.astype(np.float64),
+            j_pct,
+            f_pct,
             self.n_simulations,
             self.noise_std,
             self.judge_weight
         )
+        # 检查返回值的合理性, 若发现非有限或和异常则回退到 NumPy 实现
+        if (not np.isfinite(avg_scores).all()) or np.any(avg_scores < 0) or abs(np.sum(avg_scores)) <= 1e-12:
+            try:
+                death_counts, avg_scores = _stratified_monte_carlo_numpy(
+                    j_pct, f_pct, self.n_simulations, self.noise_std, self.judge_weight
+                )
+            except Exception:
+                # 最后保底: 设均匀分布
+                death_counts = np.ones(len(names), dtype=np.float64) * (self.n_simulations / len(names))
+                avg_scores = np.ones(len(names), dtype=np.float64) / len(names)
         self._total_simulations += self.n_simulations
         
         prob_death = death_counts / self.n_simulations
@@ -431,18 +451,23 @@ class BayesianEloEstimator:
         prob_death= prob_death / np.sum(prob_death)
         
         loser_idx = np.where(names == loser_name)[0][0]
+        loser_prob = prob_death[loser_idx]
+        max_prob = np.max(prob_death)
         
-        # 1. 一致性: 模型预测与实际淘汰的吻合度
-        consistency = prob_death[loser_idx]
+        # 1. 一致性: 使用排名分位数 + 概率比例的综合指标
+        # 排名部分: 被淘汰者在所有人中的累积分布分位
+        sorted_probs = np.sort(prob_death)[::-1]  # 降序
+        rank_idx = np.searchsorted(-sorted_probs, -loser_prob)  # 找到排名
+        rank_percentile = 1.0 - rank_idx / max(n - 1, 1)
+        # 概率比例部分
+        prob_ratio = loser_prob / max_prob if max_prob > 0 else 0.0
+        # 综合指标 (0.5*排名 + 0.5*概率比例)
+        consistency = 0.5 * rank_percentile + 0.5 * prob_ratio
         
-        # 2. 确定性: 信息熵
-        if NUMBA_AVAILABLE:
-            entropy = _compute_entropy(prob_death)
-        else:
-            mask = prob_death > 1e-9
-            entropy = -np.sum(prob_death[mask] * np.log2(prob_death[mask])) if mask.any() else 0
-        max_entropy = np.log2(n) if n > 1 else 1.0
-        certainty = 1.0 - (entropy / max_entropy)
+        # 2. 确定性: 使用有效选手数的归一化版本
+        # ESS = 1/sum(p^2)，归一化到 [0,1]
+        ess_raw = 1.0 / np.sum(prob_death ** 2)
+        certainty = 1.0 - (ess_raw - 1) / max(n - 1, 1)  # ESS=1时确定性=1, ESS=n时确定性=0
         
         # 3. Bootstrap 置信区间
         n_boot = 500
@@ -453,15 +478,18 @@ class BayesianEloEstimator:
         ci_lower = np.percentile(boot_probs, 2.5)
         ci_upper = np.percentile(boot_probs, 97.5)
         
-        # 4. KL 散度 (与均匀分布的距离)
+        # 4. KL 散度 (与均匀分布的距离)，使用对称化的JS散度
         uniform = np.ones(n) / n
-        if NUMBA_AVAILABLE:
-            kl_div = _compute_kl_divergence(prob_death, uniform)
-        else:
-            kl_div = np.sum((prob_death) * np.log((prob_death) / uniform))
+        # 使用 JS 散度 (对称且有界 [0, 1])
+        m = 0.5 * (prob_death + uniform)
+        js_div = 0.5 * np.sum(prob_death * np.log(prob_death / m + 1e-10)) + \
+                 0.5 * np.sum(uniform * np.log(uniform / m + 1e-10))
+        # JS散度的最大值是log(2)≈ 0.693
+        kl_normalized = js_div / np.log(2)
         
-        # 5. 有效样本量 (ESS)
+        # 5. 有效样本量 (ESS)，归一化
         ess = 1.0 / np.sum(prob_death ** 2)
+        ess_normalized = ess / n  # 归一化到 [0, 1]
         
         # 保存分布用于可视化
         self.weekly_distributions.append({
@@ -477,8 +505,8 @@ class BayesianEloEstimator:
             'certainty': certainty,
             'ci_lower': ci_lower,
             'ci_upper': ci_upper,
-            'kl_divergence': kl_div,
-            'effective_sample_size': ess
+            'kl_divergence': kl_normalized,
+            'effective_sample_size': ess_normalized
         }
     
     def _update_contestants(
@@ -549,6 +577,7 @@ class BayesianEloEstimator:
                 contestant.rd = min(350.0, contestant.rd * 1.1)
             
             for w in weeks:
+                # 排除已出局的选手，但保留本周退出(Withdrew)的选手用于统计
                 w_data = s_data[(s_data['week'] == w) & (s_data['status'] != 'Out')]
                 if w_data.empty:
                     continue
@@ -575,10 +604,17 @@ class BayesianEloEstimator:
                     exp_scaled = np.exp(scaled - np.max(scaled))
                     f_pct = exp_scaled / exp_scaled.sum()
                 
-                # 识别被淘汰者
+                # 识别被淘汰者和退出者
                 elim_mask = w_data['status'] == 'Eliminated'
+                withdrew_mask = w_data['status'] == 'Withdrew'
+                
+                # 被投票淘汰的选手（用于ELO更新）
                 actual_loser = w_data.loc[elim_mask, 'name'].values
                 actual_loser = actual_loser[0] if len(actual_loser) > 0 else None
+                
+                # 主动退出的选手（不参与ELO淘汰计算，但需要记录）
+                withdrew_player = w_data.loc[withdrew_mask, 'name'].values
+                withdrew_player = withdrew_player[0] if len(withdrew_player) > 0 else None
                 
                 # 计算指标
                 metrics = self.calculate_metrics(names, j_pct, f_pct, actual_loser, s, w)
@@ -590,6 +626,10 @@ class BayesianEloEstimator:
                 # 记录结果
                 for i, name in enumerate(names):
                     contestant = self.get_contestant(name)
+                    
+                    # 判断选手状态
+                    is_withdrew = (name == withdrew_player)
+                    is_eliminated = (name == actual_loser)
                     
                     # 保存 ELO 历史
                     self.elo_history.append({
@@ -610,7 +650,9 @@ class BayesianEloEstimator:
                         'ci_95_lower': metrics['ci_lower'],
                         'ci_95_upper': metrics['ci_upper'],
                         'kl_divergence': metrics['kl_divergence'],
-                        'effective_sample_size': metrics['effective_sample_size']
+                        'effective_sample_size': metrics['effective_sample_size'],
+                        'is_withdrew': is_withdrew,  # 主动退出标记
+                        'is_eliminated': is_eliminated  # 被淘汰标记
                     })
         
         return pd.DataFrame(results)
@@ -798,7 +840,18 @@ class EloVisualizer:
         # 创建红绿渐变色图
         cmap = LinearSegmentedColormap.from_list('RdYlGn', ['#d73027', '#fee08b', '#1a9850'])
         
-        im = ax.imshow(pivot.values, aspect='auto', cmap=cmap)
+        # 计算合理的色度范围 (使用百分位数避免极端值)
+        valid_data = pivot.values[pivot.values > 0]
+        if len(valid_data) > 0:
+            vmin = np.percentile(valid_data, 5)  # 5%百分位
+            vmax = np.percentile(valid_data, 95)  # 95%百分位
+            # 确保范围合理
+            vmin = max(0, vmin - 0.02)
+            vmax = min(1, vmax + 0.02)
+        else:
+            vmin, vmax = 0, 1
+        
+        im = ax.imshow(pivot.values, aspect='auto', cmap=cmap, vmin=vmin, vmax=vmax)
         
         # 设置刻度
         ax.set_xticks(range(len(pivot.columns)))
@@ -806,14 +859,22 @@ class EloVisualizer:
         ax.set_yticks(range(len(pivot.index)))
         ax.set_yticklabels(pivot.index, fontsize=9)
         
-        # 添加数值标签
+        # 移除网格线效果
+        ax.set_xticks(np.arange(len(pivot.columns)+1)-0.5, minor=True)
+        ax.set_yticks(np.arange(len(pivot.index)+1)-0.5, minor=True)
+        ax.grid(False)
+        ax.tick_params(which='minor', length=0)
+        
+        # 添加数值标签 - 使用更大的字体
         for i in range(len(pivot.index)):
             for j in range(len(pivot.columns)):
                 val = pivot.values[i, j]
-                if val > 0:
-                    text_color = 'white' if val > 0.15 or val < 0.05 else 'black'
-                    ax.text(j, i, f'{val*100:.1f}', ha='center', va='center', 
-                           fontsize=7, color=text_color)
+                if val > 0.005:  # 只显示大于0.5%的值
+                    # 根据值判断文本颜色
+                    relative_val = (val - vmin) / (vmax - vmin) if vmax > vmin else 0.5
+                    text_color = 'white' if relative_val > 0.6 or relative_val < 0.3 else 'black'
+                    ax.text(j, i, f'{val*100:.0f}', ha='center', va='center', 
+                           fontsize=10, color=text_color, fontweight='bold')
         
         ax.set_xlabel('Week', fontsize=12)
         ax.set_ylabel('Contestant', fontsize=12)
@@ -836,49 +897,74 @@ class EloVisualizer:
         """
         fig, axes = plt.subplots(2, 2, figsize=(14, 10))
         
-        # 聚合到周级别
+        # 聚合到周级别，并过滤掉 NaN 值
         weekly = self.results.groupby(['season', 'week']).first().reset_index()
+        weekly_valid = weekly.dropna(subset=['consistency_score', 'certainty_score', 'kl_divergence'])
+        
+        from scipy import stats
         
         # 1. 一致性分布
         ax1 = axes[0, 0]
-        ax1.hist(weekly['consistency_score'], bins=30, color='steelblue', edgecolor='white', alpha=0.8)
-        ax1.axvline(weekly['consistency_score'].mean(), color='red', linestyle='--', 
-                   label=f'Mean: {weekly["consistency_score"].mean():.3f}')
+        consistency = weekly_valid['consistency_score']
+        ax1.hist(consistency, bins=25, color='steelblue', edgecolor='white', alpha=0.7, density=True)
+        if len(consistency) > 5:
+            kde = stats.gaussian_kde(consistency, bw_method=0.3)
+            x_range = np.linspace(0, 1, 100)
+            ax1.plot(x_range, kde(x_range), 'r-', linewidth=2, label='KDE')
+        ax1.axvline(consistency.mean(), color='darkred', linestyle='--', linewidth=2,
+                   label=f'Mean: {consistency.mean():.3f}')
+        ax1.axvline(consistency.median(), color='orange', linestyle=':', linewidth=2,
+                   label=f'Median: {consistency.median():.3f}')
         ax1.set_xlabel('Consistency Score', fontsize=11)
-        ax1.set_ylabel('Frequency', fontsize=11)
-        ax1.set_title('Consistency Score Distribution', fontsize=13, fontweight='bold')
-        ax1.legend()
+        ax1.set_ylabel('Density', fontsize=11)
+        ax1.set_title('Consistency Score Distribution\n(Higher = Better Prediction)', fontsize=12, fontweight='bold')
+        ax1.set_xlim(0, 1.05)
+        ax1.legend(fontsize=9)
+        ax1.grid(alpha=0.3)
         
-        # 2. 确定性分布
+        # 2. 确定性分布 (现在是 1-ESS/n，范围更合理)
         ax2 = axes[0, 1]
-        ax2.hist(weekly['certainty_score'], bins=30, color='forestgreen', edgecolor='white', alpha=0.8)
-        ax2.axvline(weekly['certainty_score'].mean(), color='red', linestyle='--',
-                   label=f'Mean: {weekly["certainty_score"].mean():.3f}')
-        ax2.set_xlabel('Certainty Score', fontsize=11)
-        ax2.set_ylabel('Frequency', fontsize=11)
-        ax2.set_title('Certainty Score Distribution', fontsize=13, fontweight='bold')
-        ax2.legend()
+        certainty = weekly_valid['certainty_score']
+        ax2.hist(certainty, bins=25, color='forestgreen', edgecolor='white', alpha=0.7, density=True)
+        if len(certainty) > 5 and certainty.std() > 0.01:
+            kde = stats.gaussian_kde(certainty, bw_method=0.3)
+            x_range = np.linspace(max(0, certainty.min()-0.05), min(1, certainty.max()+0.1), 100)
+            ax2.plot(x_range, kde(x_range), 'r-', linewidth=2, label='KDE')
+        ax2.axvline(certainty.mean(), color='darkred', linestyle='--', linewidth=2,
+                   label=f'Mean: {certainty.mean():.3f}')
+        ax2.set_xlabel('Certainty Score (1-ESS/n)', fontsize=11)
+        ax2.set_ylabel('Density', fontsize=11)
+        ax2.set_title('Certainty Score Distribution\n(Low = Uniform, High = Concentrated)', fontsize=12, fontweight='bold')
+        ax2.legend(fontsize=9)
+        ax2.grid(alpha=0.3)
         
-        # 3. 一致性 vs 确定性散点图
+        # 3. 一致性 vs JS散度 散点图 (更有意义的组合)
         ax3 = axes[1, 0]
-        scatter = ax3.scatter(weekly['consistency_score'], weekly['certainty_score'],
-                             c=weekly['season'], cmap='viridis', alpha=0.7, s=30)
-        ax3.set_xlabel('Consistency', fontsize=11)
-        ax3.set_ylabel('Certainty', fontsize=11)
-        ax3.set_title('Consistency vs Certainty', fontsize=13, fontweight='bold')
+        scatter = ax3.scatter(weekly_valid['consistency_score'], weekly_valid['kl_divergence'],
+                             c=weekly_valid['season'], cmap='viridis', alpha=0.6, s=40, edgecolor='white', linewidth=0.5)
+        ax3.set_xlabel('Consistency (Prediction Accuracy)', fontsize=11)
+        ax3.set_ylabel('JS Divergence (Distribution Skewness)', fontsize=11)
+        ax3.set_title('Consistency vs Distribution Skewness', fontsize=12, fontweight='bold')
+        ax3.set_xlim(0, 1.05)
         cbar = plt.colorbar(scatter, ax=ax3)
         cbar.set_label('Season', fontsize=10)
+        ax3.grid(alpha=0.3)
         
-        # 4. KL 散度趋势
+        # 4. 一致性按赛季趋势
         ax4 = axes[1, 1]
-        weekly['time_idx'] = range(len(weekly))
-        ax4.fill_between(weekly['time_idx'], weekly['kl_divergence'], 
-                        color='coral', alpha=0.3)
-        ax4.plot(weekly['time_idx'], weekly['kl_divergence'], 
-                color='coral', linewidth=1.5)
-        ax4.set_xlabel('Time Series Index', fontsize=11)
-        ax4.set_ylabel('KL Divergence', fontsize=11)
-        ax4.set_title('KL Divergence Trend', fontsize=13, fontweight='bold')
+        season_stats = weekly_valid.groupby('season')['consistency_score'].agg(['mean', 'std']).reset_index()
+        ax4.bar(season_stats['season'], season_stats['mean'], color='coral', alpha=0.7, edgecolor='white')
+        ax4.errorbar(season_stats['season'], season_stats['mean'], yerr=season_stats['std'], 
+                    fmt='none', color='darkred', capsize=3, alpha=0.7)
+        ax4.set_xlabel('Season', fontsize=11)
+        ax4.set_ylabel('Consistency Score', fontsize=11)
+        ax4.set_title('Prediction Accuracy by Season', fontsize=12, fontweight='bold')
+        ax4.set_ylim(0, 1.1)
+        ax4.axhline(y=season_stats['mean'].mean(), linestyle='--', color='red', alpha=0.7,
+                   label=f'Overall Mean: {season_stats["mean"].mean():.3f}')
+        ax4.axhline(y=0.5, linestyle=':', color='gray', alpha=0.5, label='Random Guess (0.5)')
+        ax4.legend(fontsize=9)
+        ax4.grid(alpha=0.3)
         
         plt.suptitle('Model Diagnostics Dashboard', fontsize=16, fontweight='bold', y=1.02)
         plt.tight_layout()
@@ -898,7 +984,24 @@ class EloVisualizer:
         metrics = ['consistency_score', 'certainty_score', 'kl_divergence', 'effective_sample_size']
         metric_names = ['Consistency', 'Certainty', 'KL Divergence', 'Eff. Sample Size']
         
-        # 计算每个赛季的指标
+        # 先收集所有赛季的原始数据，用于计算归一化范围
+        raw_values = {metric: [] for metric in metrics}
+        for season in seasons:
+            season_data = self.results[self.results['season'] == season]
+            weekly = season_data.groupby('week').first()
+            for metric in metrics:
+                raw_values[metric].append(weekly[metric].mean())
+        
+        # 计算每个指标的范围用于归一化 (使用 min-max 归一化)
+        metric_ranges = {}
+        for metric in metrics:
+            vals = raw_values[metric]
+            min_v, max_v = min(vals), max(vals)
+            # 稍微扩展范围，避免边界值
+            range_v = max_v - min_v if max_v > min_v else 1
+            metric_ranges[metric] = (min_v - 0.1 * range_v, max_v + 0.1 * range_v)
+        
+        # 计算每个赛季的归一化指标
         season_values = {}
         for season in seasons:
             season_data = self.results[self.results['season'] == season]
@@ -907,12 +1010,14 @@ class EloVisualizer:
             values = []
             for metric in metrics:
                 val = weekly[metric].mean()
-                # 归一化到 0-1
-                if metric == 'kl_divergence':
-                    val = min(1, val / 3)
-                elif metric == 'effective_sample_size':
-                    val = min(1, val / 10)
-                values.append(val)
+                # Min-max 归一化到 0.15-0.85 范围，避免极端
+                min_v, max_v = metric_ranges[metric]
+                if max_v > min_v:
+                    normalized = (val - min_v) / (max_v - min_v)
+                    normalized = 0.15 + 0.70 * normalized  # 映射到 0.15-0.85
+                else:
+                    normalized = 0.5
+                values.append(normalized)
             season_values[season] = values
         
         # 创建雷达图
@@ -955,35 +1060,57 @@ class EloVisualizer:
             return
         
         names = dist_data['names']
-        probs = dist_data['prob_death']
+        probs = np.array(dist_data['prob_death'])
+        avg_scores = np.array(dist_data['avg_scores'])
         loser = dist_data['loser']
         
         # 按淘汰概率排序
         sorted_indices = np.argsort(probs)[::-1]
         names = [names[i] for i in sorted_indices]
-        probs = [probs[i] for i in sorted_indices]
+        probs = probs[sorted_indices]
+        avg_scores = avg_scores[sorted_indices]
         
-        # 颜色: 真实淘汰者高亮
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+        
+        # 左图: 淘汰概率
         colors = ['crimson' if n == loser else 'steelblue' for n in names]
-        
-        fig, ax = plt.subplots(figsize=(12, 6))
-        
-        bars = ax.bar(range(len(names)), probs, color=colors, edgecolor='white')
+        bars1 = ax1.bar(range(len(names)), probs, color=colors, edgecolor='white', alpha=0.8)
         
         # 添加数值标签
-        for bar, prob in zip(bars, probs):
+        for bar, prob in zip(bars1, probs):
             height = bar.get_height()
-            ax.annotate(f'{prob:.1%}',
-                       xy=(bar.get_x() + bar.get_width() / 2, height),
+            if prob > 0.01:  # 只显示大于1%的标签
+                ax1.annotate(f'{prob:.1%}',
+                           xy=(bar.get_x() + bar.get_width() / 2, height),
+                           xytext=(0, 3), textcoords="offset points",
+                           ha='center', va='bottom', fontsize=9)
+        
+        ax1.set_xticks(range(len(names)))
+        ax1.set_xticklabels(names, rotation=45, ha='right', fontsize=10)
+        ax1.set_ylabel('Elimination Probability', fontsize=12)
+        ax1.set_title(f'Season {season} Week {week} Elimination Probability\n(Red = Actual Eliminated: {loser})',
+                    fontsize=12, fontweight='bold')
+        ax1.yaxis.set_major_formatter(mticker.PercentFormatter(xmax=1))
+        ax1.set_ylim(0, min(1.1, max(probs) * 1.2))
+        
+        # 右图: 模拟平均得分 (转为百分比显示)
+        colors2 = ['crimson' if n == loser else 'forestgreen' for n in names]
+        avg_scores_pct = avg_scores * 100  # 转为百分比
+        bars2 = ax2.bar(range(len(names)), avg_scores_pct, color=colors2, edgecolor='white', alpha=0.8)
+        
+        for bar, score in zip(bars2, avg_scores_pct):
+            ax2.annotate(f'{score:.1f}%',
+                       xy=(bar.get_x() + bar.get_width() / 2, bar.get_height()),
                        xytext=(0, 3), textcoords="offset points",
                        ha='center', va='bottom', fontsize=9)
         
-        ax.set_xticks(range(len(names)))
-        ax.set_xticklabels(names, rotation=45, ha='right', fontsize=10)
-        ax.set_ylabel('Elimination Probability', fontsize=12)
-        ax.set_title(f'Season {season} Week {week} Elimination Probability\n(Red = Actual Eliminated: {loser})',
-                    fontsize=14, fontweight='bold')
-        ax.yaxis.set_major_formatter(mticker.PercentFormatter(xmax=1))
+        ax2.set_xticks(range(len(names)))
+        ax2.set_xticklabels(names, rotation=45, ha='right', fontsize=10)
+        ax2.set_ylabel('Simulated Average Score (%)', fontsize=12)
+        ax2.set_title(f'MC Simulated Average Scores\n(Lower score = Higher elimination risk)',
+                    fontsize=12, fontweight='bold')
+        # Y轴显示整数 (数据已经是百分比形式)
+        ax2.yaxis.set_major_formatter(mticker.FormatStrFormatter('%.0f'))
         
         plt.tight_layout()
         output_path = os.path.join(self.output_dir, f'elim_prob_s{season}w{week}.png')
@@ -997,33 +1124,44 @@ class EloVisualizer:
         """
         rankings = self.estimator.get_final_rankings().head(top_n)
         
-        fig, ax = plt.subplots(figsize=(12, max(8, top_n * 0.4)))
+        fig, ax = plt.subplots(figsize=(14, max(8, top_n * 0.45)))
         
-        # 创建渐变色
-        colors = plt.cm.viridis(np.linspace(0.2, 0.8, len(rankings)))
+        # 创建渐变色 - 从金色到银色到铜色
+        colors = []
+        for i in range(len(rankings)):
+            if i < 3:  # 前三名用金银铜
+                colors.append(['#FFD700', '#C0C0C0', '#CD7F32'][i])
+            else:
+                # 其他用渐变蓝色
+                intensity = 0.8 - 0.5 * (i - 3) / max(len(rankings) - 4, 1)
+                colors.append(plt.cm.Blues(intensity))
         
         y_pos = range(len(rankings))
-        bars = ax.barh(y_pos, rankings['final_elo'], color=colors, edgecolor='white')
         
-        # 误差条 (RD)
-        ax.errorbar(rankings['final_elo'], y_pos, 
-                   xerr=rankings['rating_deviation']/3,
-                   fmt='none', color='black', alpha=0.3, capsize=3)
+        # 绘制条形图，使用ELO相对于基准的差值
+        baseline = 1500
+        bar_values = rankings['final_elo'] - baseline
+        
+        bars = ax.barh(y_pos, bar_values, color=colors, edgecolor='darkgray', linewidth=0.5, height=0.7)
         
         # 添加数值标签
-        for i, (bar, elo) in enumerate(zip(bars, rankings['final_elo'])):
-            ax.text(elo + 5, bar.get_y() + bar.get_height()/2,
-                   f'{elo:.0f}', va='center', fontsize=10)
+        for i, (bar, elo, rd) in enumerate(zip(bars, rankings['final_elo'], rankings['rating_deviation'])):
+            # 在条形图末端显示 ELO 分数
+            ax.text(bar.get_width() + 5, bar.get_y() + bar.get_height()/2,
+                   f'{elo:.0f}', va='center', fontsize=10, fontweight='bold')
         
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(rankings['name'], fontsize=10)
+        ax.set_yticklabels(rankings['name'], fontsize=11)
         ax.invert_yaxis()  # 最高分在上
-        ax.set_xlabel('ELO Rating', fontsize=12)
+        ax.set_xlabel('ELO Rating (relative to 1500)', fontsize=12)
         ax.set_title(f'Top {top_n} Contestants Final ELO Ranking', fontsize=14, fontweight='bold')
         
         # 添加基准线
-        ax.axvline(x=1500, linestyle='--', color='gray', alpha=0.7, label='Initial ELO (1500)')
-        ax.legend(loc='lower right')
+        ax.axvline(x=0, linestyle='-', color='black', alpha=0.3, linewidth=1)
+        
+        # 添加网格
+        ax.grid(axis='x', alpha=0.3, linestyle='--')
+        ax.set_xlim(-50, max(bar_values) * 1.15)
         
         plt.tight_layout()
         output_path = os.path.join(self.output_dir, 'final_rankings.png')
@@ -1060,29 +1198,74 @@ class EloVisualizer:
     
     def plot_consistency_by_season(self):
         """
-        绘制各赛季一致性箱线图
+        绘制各赛季一致性箱线图（按时间段分组）
         """
         weekly = self.results.groupby(['season', 'week']).first().reset_index()
+        weekly_valid = weekly.dropna(subset=['consistency_score'])
         
-        fig, ax = plt.subplots(figsize=(14, 6))
+        fig, axes = plt.subplots(1, 2, figsize=(16, 6))
         
-        seasons = sorted(weekly['season'].unique())
-        data = [weekly[weekly['season'] == s]['consistency_score'].values for s in seasons]
+        # 左图：按时期分组（每5-6个赛季为一组）
+        ax1 = axes[0]
+        seasons = sorted(weekly_valid['season'].unique())
+        n_groups = 6
+        group_size = len(seasons) // n_groups + 1
         
-        bp = ax.boxplot(data, patch_artist=True)
+        group_labels = []
+        group_data = []
+        for i in range(n_groups):
+            start_idx = i * group_size
+            end_idx = min((i + 1) * group_size, len(seasons))
+            if start_idx >= len(seasons):
+                break
+            group_seasons = seasons[start_idx:end_idx]
+            data = weekly_valid[weekly_valid['season'].isin(group_seasons)]['consistency_score'].values
+            if len(data) > 0:
+                group_data.append(data)
+                group_labels.append(f'S{group_seasons[0]}-S{group_seasons[-1]}')
         
-        # 设置颜色
-        colors = plt.cm.viridis(np.linspace(0.2, 0.8, len(seasons)))
+        bp = ax1.boxplot(group_data, patch_artist=True, widths=0.6)
+        colors = plt.cm.Blues(np.linspace(0.3, 0.8, len(group_data)))
         for patch, color in zip(bp['boxes'], colors):
             patch.set_facecolor(color)
-            patch.set_alpha(0.7)
+            patch.set_alpha(0.8)
+        for median in bp['medians']:
+            median.set_color('darkred')
+            median.set_linewidth(2)
         
-        ax.set_xticklabels([f'S{s}' for s in seasons], fontsize=9, rotation=45)
-        ax.set_xlabel('Season', fontsize=12)
-        ax.set_ylabel('Consistency Score', fontsize=12)
-        ax.set_title('Consistency Score by Season', fontsize=14, fontweight='bold')
-        ax.axhline(y=0.5, linestyle='--', color='red', alpha=0.5, label='Threshold (0.5)')
-        ax.legend()
+        ax1.set_xticklabels(group_labels, fontsize=10)
+        ax1.set_xlabel('Season Groups', fontsize=12)
+        ax1.set_ylabel('Consistency Score', fontsize=12)
+        ax1.set_title('Consistency by Season Period', fontsize=14, fontweight='bold')
+        ax1.axhline(y=0.5, linestyle='--', color='red', alpha=0.5, label='Random Guess (0.5)')
+        ax1.set_ylim(0, 1.05)
+        ax1.legend(loc='lower right')
+        ax1.grid(axis='y', alpha=0.3)
+        
+        # 右图：时间序列趋势（按赛季平均）
+        ax2 = axes[1]
+        season_stats = weekly_valid.groupby('season')['consistency_score'].agg(['mean', 'std', 'count']).reset_index()
+        
+        ax2.fill_between(season_stats['season'], 
+                        season_stats['mean'] - season_stats['std'],
+                        season_stats['mean'] + season_stats['std'],
+                        alpha=0.3, color='steelblue', label='±1 Std Dev')
+        ax2.plot(season_stats['season'], season_stats['mean'], 
+                'o-', color='steelblue', linewidth=2, markersize=6, label='Season Mean')
+        
+        # 添加滚动平均线
+        if len(season_stats) >= 5:
+            rolling_mean = season_stats['mean'].rolling(window=5, center=True).mean()
+            ax2.plot(season_stats['season'], rolling_mean, 
+                    '--', color='darkred', linewidth=2, label='5-Season Moving Avg')
+        
+        ax2.axhline(y=0.5, linestyle=':', color='gray', alpha=0.7, label='Random Guess')
+        ax2.set_xlabel('Season', fontsize=12)
+        ax2.set_ylabel('Consistency Score', fontsize=12)
+        ax2.set_title('Consistency Trend Over Seasons', fontsize=14, fontweight='bold')
+        ax2.set_ylim(0, 1.05)
+        ax2.legend(loc='lower right', fontsize=9)
+        ax2.grid(alpha=0.3)
         
         plt.tight_layout()
         output_path = os.path.join(self.output_dir, 'consistency_by_season.png')
