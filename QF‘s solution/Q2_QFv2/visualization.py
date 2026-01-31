@@ -33,29 +33,59 @@ df_merged = pd.merge(
     suffixes=('_Percent', '_Rank')
 )
 
+def assign_mechanism(season):
+    if 1 <= season <= 2 or season >= 28:
+        return 'Actual: Rank Rule'
+    else:
+        return 'Actual: Percentage Rule'
+    
+df_merged['Mechanism_Label'] = df_merged['Season'].apply(assign_mechanism)
 # --- 3. Visualization ---
 
+# 定义颜色映射：蓝色代表排名制，黄色代表百分比制
+color_palette = {
+    'Actual: Rank Rule': '#3498db',        # Academic Blue
+    'Actual: Percentage Rule': '#f1c40f'   # Academic Gold
+}
 # Plot 1: Methodological Agreement (Scatter Plot)
-plt.figure(figsize=(7, 6))
+plt.figure(figsize=(8, 7))
+
+# 定义颜色映射：蓝色代表排名制，黄色代表百分比制
+color_palette = {
+    'Actual: Rank Rule': '#3498db',        # Academic Blue
+    'Actual: Percentage Rule': '#f1c40f'   # Academic Gold
+}
+
+# 绘制散点图
 sns.scatterplot(
     data=df_merged, 
     x='Est_Fan_Share_Percent', 
     y='Est_Fan_Share_Rank', 
-    alpha=0.6, 
-    edgecolor=None,
-    color='#2c3e50',
-    s=40
+    hue='Mechanism_Label',
+    palette=color_palette,
+    alpha=0.7, 
+    edgecolor='w',
+    linewidth=0.5,
+    s=45,
+    style='Mechanism_Label' # 增加形状区分，确保黑白打印时依然可读
 )
-# Add Reference Diagonal (y=x)
+
+# 绘制对角线 (The Theoretical Identity Line)
+# 如果模型估算完全一致，所有点应落在该线上
 max_val = max(df_merged['Est_Fan_Share_Percent'].max(), df_merged['Est_Fan_Share_Rank'].max())
-plt.plot([0, max_val], [0, max_val], color='#e74c3c', linestyle='--', linewidth=1.5, label='Perfect Agreement')
-plt.title('Figure 1: Cross-Method Validation of Fan Share Estimates')
-plt.xlabel('Estimated Share (Percentage Rule)')
-plt.ylabel('Estimated Share (Rank Rule)')
-plt.legend(frameon=True, loc='upper left')
-plt.grid(True, linestyle=':', alpha=0.6)
+plt.plot([0, max_val], [0, max_val], color='#e74c3c', linestyle='--', linewidth=1.2, label='Perfect Agreement ($y=x$)')
+
+# 图表精修
+plt.title('Figure 1: Cross-Method Robustness & Historical Mechanism Comparison', fontweight='bold')
+plt.xlabel('Estimated Fan Share $\hat{P}_{i,t}$ (Percentage Mapping)', fontsize=10)
+plt.ylabel('Estimated Fan Share $\hat{R}_{i,t}$ (Rank Mapping)', fontsize=10)
+
+# 优化图例
+plt.legend(title='Voting Era', frameon=True, loc='upper left', fontsize='small')
+plt.grid(True, linestyle=':', alpha=0.5)
+
 plt.tight_layout()
-plt.savefig('QF‘s solution/Q2_QFv2/visualization/Comparison_Scatter.png')
+plt.savefig('QF‘s solution/Q2_QFv2/visualization/Comparison_Scatter_Colored.png')
 plt.show()
 
 # Plot 2: Micro-Level Discrepancy with Error Bars (Bar Plot)

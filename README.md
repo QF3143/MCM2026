@@ -118,6 +118,7 @@ Y轴 (Normalized Fan Vote)：模型估算出你拿了多少观众票（相对于
 基于Q1V2计算：分别用两种方法估算了每个赛季的预测投票率，可视化方法展示如下：
 【散点图】如果两个模型完全一致，所有点都应该沿着对角线分布
 现在发现：低分区：点分布在红线上方。这意味着对于弱势选手（粉丝少），排名制给出的权重往往高于其实际得票率。（Rank制在“补贴”弱者）。高分区：点分布在红线下方。这意味着对于超级明星（粉丝多），排名制给出的权重往往低于其实际得票率。（Rank制在“打压”强者）。证明了排名制具有**“均值回归（Regression to the Mean）”**的系统性偏差：
+观察上色后的散点图，实际上采用了百分比法的人，如果将方法改成排名法，那么他的估算得票率将更高；说明如果所有选手的评委分数非常接近（例如都在 25−28 分之间），他们在百分比制下的得分差距极小，在这种情况下，选手只需要少量的粉丝投票优势（较低的得票率P）就能弥补评委分的不足。而一旦切换到排名制，这种“接近”的状态消失了，取而代之的是冰次的位次差距，迫使模型估算出更高的粉丝得票率来维持其生存结果。
 [方差压缩]排名制将极端的得票差异（如 90% vs 10%）强制压缩为相邻的整数（Rank 1 vs Rank 2）。这导致了数据的方差显著降低。
 [罗宾汉效应]Rank Rule 实际上在进行“劫富济贫”。它拿走了高人气选手的“溢出选票”（多出来的票对排名没用），并隐性地提升了低人气选手的权重（只要不是最后一名，排名分就不会太难看）。
 [信息丢失]散点的离散程度（垂直方向的抖动）表明，排名制丢失了“差距到底有多大”这一关键信息。
@@ -127,6 +128,12 @@ Figure 1 presents a scatter plot comparison between the estimated fan shares der
 Conclusion: Mathematically, the Rank Rule acts as a low-pass filter, smoothing out extreme variations in public opinion. While this may increase competition suspense, it statistically distorts the true "Voice of the People," making it harder for dominant talent to secure a mathematically justified lead.
 【柱状图】【概率密度分布图】感觉这两张图没什么有用的信息……主要都显示了两张图粉丝投票总体分布上是没有差异的
 
+## Q2_2)
+数据标准化：为了消除不同赛季裁判人数（3人或4人）的影响，我们将每周的裁判原始分转换为标准分（Z-Score）。
+设定淘汰阈值：在每一周，找到被淘汰选手中的平均分。这代表了当周“被淘汰的平均水平”。
+计算幸存偏差：检查所有幸存（未被淘汰）的选手。如果某个幸存选手的得分低于这个阈值，说明他/她本该被淘汰（按裁判标准），但被粉丝救了回来。
+争议分累加：计算差值（阈值 - 幸存者得分），并将其累加。差值越大，说明“德不配位”的程度越严重。
+总排名：按累加的争议分对所有历史选手进行排序，得分最高者即为“最具争议选手”（也就是依靠粉丝投票逆风翻盘最严重的选手）。
 ## Q3
 第二阶段：特征工程 (Feature Engineering)
 【舞伴能力指数】：直接用 One-Hot 编码舞伴会导致特征稀疏（维度太高）。使用Target Encoding (目标编码)。计算该舞伴在其他赛季的历史平均分。公式Efficacyp=Average Score of Partner p in all seasons except current
