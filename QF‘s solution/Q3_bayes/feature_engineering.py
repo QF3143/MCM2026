@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 # 1. 加载合并后的数据
-df = pd.read_csv('QF‘s solution/Q3/merged_data_for_q3.csv')
+df = pd.read_csv('QF‘s solution/Q3_bayes/merged_data_for_q3.csv')
 
 # --- 核心特征工程 ---
 
@@ -71,4 +71,4 @@ print("\n前5行预览:")
 print(X.head())
 
 # 保存处理好的特征矩阵（可选）
-df_encoded.to_csv('QF‘s solution/Q3/feature_engineered_data.csv', index=False)
+df_encoded.to_csv('QF‘s solution/Q3_bayes/feature_engineered_data.csv', index=False)

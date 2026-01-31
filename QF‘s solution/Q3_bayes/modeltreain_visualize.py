@@ -15,7 +15,7 @@ colors_fan = '#E67E22'   # 学术橙
 
 # --- 1. 加载数据 ---
 # 确保文件在当前目录下
-df = pd.read_csv('QF‘s solution/Q3/feature_engineered_data.csv')
+df = pd.read_csv('QF‘s solution/Q3_bayes/feature_engineered_data.csv')
 
 # 填补空值 (GBR能处理，但为了安全起见)
 features = ['celebrity_age_during_season', 'Pro_Efficacy', 'Age_Squared'] + [c for c in df.columns if 'Ind_' in c]
@@ -37,7 +37,7 @@ imp_df['Judge'] = imp_df['Judge'] / imp_df['Judge'].sum() * 100
 imp_df['Fan'] = imp_df['Fan'] / imp_df['Fan'].sum() * 100
 imp_df = imp_df.sort_values('Judge') # 按裁判重要性排序
 
-imp_df.to_csv("QF‘s solution/Q3/importance.csv")
+imp_df.to_csv("QF‘s solution/Q3_bayes/figure/importance.csv")
 
 # --- 3. 绘制蝴蝶图 (Butterfly Chart) ---
 fig, ax = plt.subplots(figsize=(12, 7))
@@ -59,7 +59,7 @@ ax.legend(loc='lower right', frameon=True, fontsize=11)
 ax.grid(axis='x', linestyle='--', alpha=0.6)
 
 plt.tight_layout()
-plt.savefig('contrast_butterfly_chart.png', dpi=300)
+plt.savefig('QF‘s solution/Q3_bayes/figure/contrast_butterfly_chart.png', dpi=300)
 plt.show()
 
 # --- 4. 绘制年龄效应双轴图 (Age Effect Analysis) ---
@@ -98,7 +98,7 @@ lines2, labels2 = ax2.get_legend_handles_labels()
 plt.title('Non-Linear Age Dynamics: Technical Decline vs. Fan Sympathy', fontsize=14, fontweight='bold', pad=15)
 
 plt.tight_layout()
-plt.savefig('age_dynamics_contrast.png', dpi=300)
+plt.savefig('QF‘s solution/Q3_bayes/figure/age_dynamics_contrast.png', dpi=300)
 plt.show()
 
 print("图表已生成：'contrast_butterfly_chart.png' 和 'age_dynamics_contrast.png'")

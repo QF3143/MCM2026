@@ -75,7 +75,7 @@ def merge_mcm_data(fanvote_path, raw_data_path, output_path):
 # 使用示例 (请确保文件名与你上传的一致)
 if __name__ == "__main__":
     merged_df = merge_mcm_data(
-        fanvote_path='QF‘s solution/Q3/realfanvote.csv', 
-        raw_data_path='QF‘s solution/Q3/2026_MCM_Problem_C_Data.csv', 
+        fanvote_path='QF‘s solution/Bayes_Elo/real_figures/fan_vote_estimates_weekly.csv', 
+        raw_data_path='2026_MCM_Problem_C_Data.csv', 
         output_path='merged_data_for_q3.csv'
     )
