@@ -453,8 +453,7 @@ class BayesianEloEstimator:
         else:
             f_pct = f_pct / f_pct.sum()
         
-        use_ranking_rule = False
-        #(season <= 2 or season > 27)
+        use_ranking_rule = False#(season <= 2 or season > 27)
 
         # [修改] 调用蒙特卡洛函数，传入 use_ranking_rule
         death_counts, avg_scores = self._mc_func(
