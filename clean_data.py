@@ -17,30 +17,58 @@ def clean_dwts_data(file_path):
         season = row['season']
         result_str = str(row['results']) # 例如 "Eliminated Week 3" 或 "Runner-up"
         
-        # 解析该选手到底在哪一周被淘汰的
+        # 解析该选手到底在哪一周被淘汰/退出的
         elim_week = 99 # 默认没淘汰（进入决赛）
+        is_withdrew = 'Withdrew' in result_str  # 标记是否主动退出
+        
         match = re.search(r'Week\s*(\d+)', result_str)
         if 'Eliminated' in result_str and match:
             elim_week = int(match.group(1))
+        
+        # 对于 Withdrew 选手，需要找到他们最后一周有有效分数的周
+        last_active_week = 0
+        if is_withdrew:
+            for w in range(1, 12):
+                # 使用精确匹配: week1_ 而不是 week1 (避免 week1 匹配 week10, week11)
+                current_week_cols = [c for c in score_cols if f'week{w}_' in c.lower()]
+                if current_week_cols:
+                    scores = [row[c] for c in current_week_cols 
+                              if pd.notnull(row[c]) and (isinstance(row[c], (int, float)) and row[c] > 0)]
+                    if len(scores) > 0:
+                        last_active_week = w
             
         # 遍历每一周提取分数
         for w in range(1, 12): # 假设最多11周
-            # 找到当前周的所有评委得分列
-            current_week_cols = [c for c in score_cols if f'week{w}' in c.lower()]
+            # 使用精确匹配: week1_ 而不是 week1 (避免 week1 匹配 week10, week11)
+            current_week_cols = [c for c in score_cols if f'week{w}_' in c.lower()]
             if not current_week_cols: continue
             
-            # 计算这一周的平均分
+            # 计算这一周的平均分 (只考虑非空值)
             scores = [row[c] for c in current_week_cols if pd.notnull(row[c])]
             
-            if len(scores) > 0:
-                avg_score = sum(scores) / len(scores)
-                # 标记该选手在本周的状态
-                status = "In"
-                if w == elim_week:
-                    status = "Eliminated"
-                elif w > elim_week:
-                    status = "Out"
+            # 跳过没有任何分数的周
+            if len(scores) == 0:
+                continue
                 
+            avg_score = sum(scores) / len(scores)
+            
+            # 如果平均分为0或接近0，说明选手已经出局，跳过
+            if avg_score < 0.1:
+                continue
+            
+            # 标记该选手在本周的状态
+            status = "In"
+            if w == elim_week:
+                status = "Eliminated"
+            elif w > elim_week:
+                status = "Out"
+            elif is_withdrew and w == last_active_week:
+                status = "Withdrew"  # 主动退出，不是被投票淘汰
+            elif is_withdrew and w > last_active_week:
+                status = "Out"
+            
+            # 只保存有效参赛记录（非Out状态，或者是Out但分数不为0的异常情况）
+            if status != "Out":
                 cleaned_rows.append({
                     'season': season,
                     'week': w,
