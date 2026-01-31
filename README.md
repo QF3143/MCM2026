@@ -105,3 +105,23 @@ Y轴 (Normalized Fan Vote)：模型估算出你拿了多少观众票（相对于
 展示19季冠军的人气曲线；置信区间在决赛场收窄是因为决赛周的模型逻辑从“存活判定”切换到了“精确排名判定”的全序约束，极大地压缩了参数空间，剔除了 99% 以上在常规周可行的随机扰动。这种从“不等式约束”向“等式约束”的质变，是导致 CI 宽度骤降的根本原因。
 "The persistent width of the confidence intervals during preliminary weeks reflects the inherent observational sparsity of the DWTS voting system. Our Monte Carlo analysis correctly identifies that the 'survival constraint' (avoiding elimination) is insufficient to uniquely localize fan preferences. The subsequent sharp convergence of the CI in the final week (W=0.0275) validates that our model successfully transitions from a low-information regime to a high-information regime, capturing the definitive popularity of the winner only when strict ordinal data becomes available."
 
+## Q3
+第二阶段：特征工程 (Feature Engineering)
+【舞伴能力指数】：直接用 One-Hot 编码舞伴会导致特征稀疏（维度太高）。使用Target Encoding (目标编码)。计算该舞伴在其他赛季的历史平均分。公式Efficacyp=Average Score of Partner p in all seasons except current
+【行业归类】 将细碎的 Industry（如 "Soap Opera Actor", "Film Actor"）归类为大类（"Actor"）。创建 Is_Athlete (是否运动员), Is_Performer (是否表演类) 等布尔特征。
+【年龄的非线性处理】：假设：年龄的影响不是线性的（太老跳不动，太年轻没阅历）。添加年龄的平方项，捕捉 "倒U型" 或 "U型" 关系
+
+第三阶段：双模型训练 (Dual-Model Training)
+XGBoost模型训练
+Model A (Judge):
+X (特征): Age, Partner_Efficacy, Industry_Features, Gender, Season, Week...
+Y (目标): Total_Judge_Score
+Model B (Fan):
+X (特征): 同上
+Y (目标): Estimated_Fan_Votes (需标准化，如取对数 log1p，因为票数跨度大)
+第四阶段：SHAP 归因分析与对比:
+1. 核心发现 (Key Findings)
+根据模型输出的特征重要性对比（已生成 feature_importance_comparison.csv）：舞伴是决定性因素，但裁判更看重 (The "Pro" Effect)差异：它解释了 54.3% 的裁判打分变异，但只解释了 44.5% 的粉丝投票变异。裁判评分高度依赖于舞伴的技术指导（Technical Merit），而粉丝虽然也看重表现，但受舞伴的影响相对较弱（约低10个百分点），这留出了更多空间给“明星个人魅力”。
+年龄的双重效应 (The Age Paradox)
+年龄（及年龄平方）在两个模型中的重要性都排在第2、3位（合计约38%-41%）。差异：年龄对粉丝的影响权重（合计 41.3%）竟然略高于对裁判的影响（合计 38.0%）。通常认为裁判会惩罚高龄选手的僵硬，但数据显示粉丝对年龄非常敏感。结合SHAP分析，这可能意味着粉丝不仅会投票给年轻偶像，也会对高龄励志选手表现出强烈的情感偏好（Sympathy Vote），或者反过来，极其排斥某些年龄段。行业影响微弱,行业特征（Industry）的整体贡献度较低，说明“你是谁（演员/运动员）”不如“你表现得怎么样（舞伴/年龄状态）”重要。
+Divergent Age Dynamics. The blue dashed line illustrates a steep technical penalty for older contestants from judges. In contrast, the orange solid line reveals that fan support remains relatively resilient for older demographics, decoupling popularity from physical performance decline.
