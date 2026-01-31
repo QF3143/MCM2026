@@ -146,6 +146,12 @@ Conclusion: Mathematically, the Rank Rule acts as a low-pass filter, smoothing o
 推进：进入 t+1 周。
 For the counterfactual simulation, we employed a 'Shadow History' approach. In each week t, we included all contestants who historically competed in that week. We then applied the alternative voting rule (e.g., Judges' Save). If our target contestant (e.g., Bobby Bones) was identified for elimination under the new rule, the simulation terminated, marking that week as their 'Counterfactual Elimination Point'. This method utilizes the ground-truth technical scores from history, avoiding speculative data generation for contestants who did not actually perform.
 
+## Q2_3
+[量化评估方式]
+引入一致性系数ρ=1-（6*di^2）/n(n^2-1),n为有当季多少选手，di为=最终排名-粉丝排名（或裁判排名）
+bias = （ρ裁判）-（ρ粉丝）
+如果计算结果显示方法A的平均 ∣Δρ∣ 显著低于方法B，则证明：方法A通过压缩极端极值的影响，使得技术与人气达到了更好的平衡
+根据这个逻辑，采用第二问的模拟器模拟争议分最高的五十人位争议人物的模拟排名，计算他们的bias，量化来看各个方法的性能
 
 ## Q3
 第二阶段：特征工程 (Feature Engineering)
