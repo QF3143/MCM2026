@@ -104,6 +104,15 @@ Y轴 (Normalized Fan Vote)：模型估算出你拿了多少观众票（相对于
 [Trajectory_Alfonso_Ribeiro.png]
 展示19季冠军的人气曲线；置信区间在决赛场收窄是因为决赛周的模型逻辑从“存活判定”切换到了“精确排名判定”的全序约束，极大地压缩了参数空间，剔除了 99% 以上在常规周可行的随机扰动。这种从“不等式约束”向“等式约束”的质变，是导致 CI 宽度骤降的根本原因。
 "The persistent width of the confidence intervals during preliminary weeks reflects the inherent observational sparsity of the DWTS voting system. Our Monte Carlo analysis correctly identifies that the 'survival constraint' (avoiding elimination) is insufficient to uniquely localize fan preferences. The subsequent sharp convergence of the CI in the final week (W=0.0275) validates that our model successfully transitions from a low-information regime to a high-information regime, capturing the definitive popularity of the winner only when strict ordinal data becomes available."
+3. [模型评价图]
+【不确定性分布直方图】 (Distribution of Model Uncertainty)
+图象特征：如果直方图呈现“高瘦”的形态（High Peak），且长尾（Long Tail）较少，大部分数据集中在左侧低值区。说明了模型对绝大多数选手的粉丝份额估计是非常确定的（Standard Deviation很小）。模型不是在“瞎猜”，而是有很强的信号捕捉能力。异常值受控：虽然存在极少数难以预测的个例（长尾部分），但整体系统的预测误差是收敛且可控的。
+【估计值与置信区间宽度关系图】 (Estimate vs. CI Width)图象特征：横轴是粉丝份额，纵轴是置信区间宽度。如果你看到点沿一条斜线分布，或者均匀分布，没有奇怪的离群点。结构一致性：证明了模型对待所有选手是“公平”的。不确定性（CI Width）通常随估计值（Est Share）的增加而线性增加，这是统计学上的自然现象（方差与均值相关）。无系统性偏差：如果图上出现某些点偏离主群体很远，说明模型对某些特定类型的选手“失灵”了。如果点聚类紧密，说明模型逻辑高度一致。
+【跨赛季波动性箱线图】 (Robustness Across Seasons)
+图象特征：横轴是赛季，纵轴是标准差。如果各个箱子的高度（中位数）基本持平，没有某个赛季突然极其离谱。说明了什么（Robustness / Generalizability）：
+适应规则变更：题目背景中提到DWTS的规则在第1、2赛季用Rank，后面用Percentage。如果这张图显示早期赛季和后期赛季的模型波动性一致，直接证明了你的模型具有极强的泛化能力，未受规则剧变的影响。时间鲁棒性：证明模型不会因为时间推移、选手质量变化而失效。
+【模拟有效性与不确定性关系图】 (Valid Simulations vs. Uncertainty)
+图象特征：横轴是有效模拟次数，纵轴是标准差。如果随着模拟次数增加，标准差趋于稳定（不再剧烈跳动）。说明了什么（Algorithmic Convergence）：算法收敛：这是对你使用的蒙特卡洛（Monte Carlo）或贝叶斯采样方法的直接验证。说明你的采样次数（Simulations）已经足够多，结果已经收敛到真值附近，不再受随机数种子的干扰。
 
 ## Q3
 第二阶段：特征工程 (Feature Engineering)

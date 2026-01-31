@@ -37,6 +37,8 @@ imp_df['Judge'] = imp_df['Judge'] / imp_df['Judge'].sum() * 100
 imp_df['Fan'] = imp_df['Fan'] / imp_df['Fan'].sum() * 100
 imp_df = imp_df.sort_values('Judge') # 按裁判重要性排序
 
+imp_df.to_csv("QF‘s solution/Q3/importance.csv")
+
 # --- 3. 绘制蝴蝶图 (Butterfly Chart) ---
 fig, ax = plt.subplots(figsize=(12, 7))
 y = np.arange(len(imp_df))
