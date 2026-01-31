@@ -79,7 +79,7 @@ I = 0 ，如果选手i不是实际被淘汰者
 局限：
     不淘汰人的周没法产生有效信息；对这样的周，无法得到合理预测；
 
-## 可视化
+## Q1V2可视化
 [Normalized_Survival_Frontier.png]:
 1. 为什么要“归一化”？
 背景差异：
@@ -113,6 +113,19 @@ Y轴 (Normalized Fan Vote)：模型估算出你拿了多少观众票（相对于
 适应规则变更：题目背景中提到DWTS的规则在第1、2赛季用Rank，后面用Percentage。如果这张图显示早期赛季和后期赛季的模型波动性一致，直接证明了你的模型具有极强的泛化能力，未受规则剧变的影响。时间鲁棒性：证明模型不会因为时间推移、选手质量变化而失效。
 【模拟有效性与不确定性关系图】 (Valid Simulations vs. Uncertainty)
 图象特征：横轴是有效模拟次数，纵轴是标准差。如果随着模拟次数增加，标准差趋于稳定（不再剧烈跳动）。说明了什么（Algorithmic Convergence）：算法收敛：这是对你使用的蒙特卡洛（Monte Carlo）或贝叶斯采样方法的直接验证。说明你的采样次数（Simulations）已经足够多，结果已经收敛到真值附近，不再受随机数种子的干扰。
+
+## Q2
+基于Q1V2计算：分别用两种方法估算了每个赛季的预测投票率，可视化方法展示如下：
+【散点图】如果两个模型完全一致，所有点都应该沿着对角线分布
+现在发现：低分区：点分布在红线上方。这意味着对于弱势选手（粉丝少），排名制给出的权重往往高于其实际得票率。（Rank制在“补贴”弱者）。高分区：点分布在红线下方。这意味着对于超级明星（粉丝多），排名制给出的权重往往低于其实际得票率。（Rank制在“打压”强者）。证明了排名制具有**“均值回归（Regression to the Mean）”**的系统性偏差：
+[方差压缩]排名制将极端的得票差异（如 90% vs 10%）强制压缩为相邻的整数（Rank 1 vs Rank 2）。这导致了数据的方差显著降低。
+[罗宾汉效应]Rank Rule 实际上在进行“劫富济贫”。它拿走了高人气选手的“溢出选票”（多出来的票对排名没用），并隐性地提升了低人气选手的权重（只要不是最后一名，排名分就不会太难看）。
+[信息丢失]散点的离散程度（垂直方向的抖动）表明，排名制丢失了“差距到底有多大”这一关键信息。
+Figure 1 presents a scatter plot comparison between the estimated fan shares derived from the Percentage Rule (x-axis) and the Rank Rule (y-axis). The red dashed line represents the locus of perfect agreement (y=x). While the two methods exhibit a positive correlation (R^2>0.9), a distinct sigmoidal deviation pattern is observable, revealing the inherent "equalizing bias" of the Rank Rule.
+1. Subsidization of the Tail (Low-end Bias): In the lower quadrant (fan share <0.15), the data points predominantly lie above the reference line. This indicates that the Rank Rule systematically overestimates the support for less popular contestants. By converting continuous vote counts into discrete ordinal ranks, the algorithm artificially inflates the value of marginal survival, effectively providing a "safety net" for weaker contestants.
+2. Suppression of the Head (High-end Compression): Conversely, in the upper quadrant, the Rank Rule estimates consistently fall below the reference line. This phenomenon, known as variance compression, demonstrates that the Rank mechanism fails to capture the magnitude of "superstar" popularity. A contestant with 50% of the total votes receives the same rank score (Rank 1) as one with 25% in a tighter race, thereby discarding significant voter preference information.
+Conclusion: Mathematically, the Rank Rule acts as a low-pass filter, smoothing out extreme variations in public opinion. While this may increase competition suspense, it statistically distorts the true "Voice of the People," making it harder for dominant talent to secure a mathematically justified lead.
+【柱状图】【概率密度分布图】感觉这两张图没什么有用的信息……主要都显示了两张图粉丝投票总体分布上是没有差异的
 
 ## Q3
 第二阶段：特征工程 (Feature Engineering)
