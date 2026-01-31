@@ -128,12 +128,25 @@ Figure 1 presents a scatter plot comparison between the estimated fan shares der
 Conclusion: Mathematically, the Rank Rule acts as a low-pass filter, smoothing out extreme variations in public opinion. While this may increase competition suspense, it statistically distorts the true "Voice of the People," making it harder for dominant talent to secure a mathematically justified lead.
 【柱状图】【概率密度分布图】感觉这两张图没什么有用的信息……主要都显示了两张图粉丝投票总体分布上是没有差异的
 
-## Q2_2)
+## Q2_2
+[筛选争议性人物]
 数据标准化：为了消除不同赛季裁判人数（3人或4人）的影响，我们将每周的裁判原始分转换为标准分（Z-Score）。
 设定淘汰阈值：在每一周，找到被淘汰选手中的平均分。这代表了当周“被淘汰的平均水平”。
 计算幸存偏差：检查所有幸存（未被淘汰）的选手。如果某个幸存选手的得分低于这个阈值，说明他/她本该被淘汰（按裁判标准），但被粉丝救了回来。
 争议分累加：计算差值（阈值 - 幸存者得分），并将其累加。差值越大，说明“德不配位”的程度越严重。
 总排名：按累加的争议分对所有历史选手进行排序，得分最高者即为“最具争议选手”（也就是依靠粉丝投票逆风翻盘最严重的选手）。
+[模拟器]
+对于每一个争议选手：
+初始化：从该赛季的 Week 1 开始。
+循环（Week t=1 to Final）：
+计算：读取第 t 周所有选手的真实裁判分Jt,模型估算的粉丝票F
+应用规则：使用新规则（如“Rank制”或“裁判拯救制”）计算所有人的去留。
+如果争议选手在本周被新规则淘汰 → 模拟结束。记录：“在新规则下，该选手止步于第 t 周，最终排名第 X 名（而非实际的第 X 名）。”
+如果争议选手幸存，但被淘汰的是另一位选手（与历史事实不同） → 这里为了简化模型，假设被“错误”保留下来的用此人历次平均水平替代。模拟中不存在退赛的情况。
+推进：进入 t+1 周。
+For the counterfactual simulation, we employed a 'Shadow History' approach. In each week t, we included all contestants who historically competed in that week. We then applied the alternative voting rule (e.g., Judges' Save). If our target contestant (e.g., Bobby Bones) was identified for elimination under the new rule, the simulation terminated, marking that week as their 'Counterfactual Elimination Point'. This method utilizes the ground-truth technical scores from history, avoiding speculative data generation for contestants who did not actually perform.
+
+
 ## Q3
 第二阶段：特征工程 (Feature Engineering)
 【舞伴能力指数】：直接用 One-Hot 编码舞伴会导致特征稀疏（维度太高）。使用Target Encoding (目标编码)。计算该舞伴在其他赛季的历史平均分。公式Efficacyp=Average Score of Partner p in all seasons except current
