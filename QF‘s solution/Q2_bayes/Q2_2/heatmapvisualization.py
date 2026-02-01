@@ -56,10 +56,10 @@ for i, (name, season, real_rule_col) in enumerate(target_people):
     for rule_key in rules_map.keys():
         survived_until = person_row[rule_key]
         # 构建生存矩阵: 1-晋级, 0-淘汰, 2-赛季外
-        matrix_row = [1 if w <= survived_until else 0 if w <= max_w else 2 for w in range(1, 11)]
+        matrix_row = [1 if w <= survived_until else 0 if w <= max_w else 2 for w in range(1, 12)]
         matrix_data.append(matrix_row)
     
-    matrix_df = pd.DataFrame(matrix_data, index=rules_map.values(), columns=range(1, 11))
+    matrix_df = pd.DataFrame(matrix_data, index=rules_map.values(), columns=range(1, 12))
     
     # 绘制热力图
     sns.heatmap(matrix_df, ax=ax, cmap=cmap, cbar=False, linewidths=2, linecolor='white', vmin=0, vmax=2)
@@ -70,7 +70,7 @@ for i, (name, season, real_rule_col) in enumerate(target_people):
         if label == historical_label:
             ax.get_yticklabels()[idx].set_weight('bold')
             ax.get_yticklabels()[idx].set_color('#1F77B4')
-            rect = plt.Rectangle((0, idx), 10, 1, fill=False, edgecolor='#1F77B4', lw=4, clip_on=False)
+            rect = plt.Rectangle((0, idx), 11, 1, fill=False, edgecolor='#1F77B4', lw=4, clip_on=False)
             ax.add_patch(rect)
     
     ax.set_title(f"{name} (Season {season})", fontsize=18, fontweight='bold', pad=15)

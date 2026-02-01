@@ -437,7 +437,7 @@ class BayesianEloEstimator:
         loser_name: Optional[str],
         season: int,   # 确保这两个参数存在
         week: int
-    ) -> Dict[str, float]:
+    ) -> Dict[str, Any]:
         """
         计算多维度评估指标 (自动判断 Season 1-2 使用排名制)
         """
@@ -447,6 +447,7 @@ class BayesianEloEstimator:
             return {
                 'consistency': np.nan, 'certainty': np.nan,
                 'ci_lower': np.nan, 'ci_upper': np.nan,
+                'f_ci_lower': np.full(n, np.nan), 'f_ci_upper': np.full(n, np.nan),
                 'kl_divergence': np.nan, 'effective_sample_size': float(self.n_simulations),
                 'rule_used': 'none'
             }
@@ -465,7 +466,7 @@ class BayesianEloEstimator:
         else:
             f_pct = f_pct / f_pct.sum()
         
-        use_ranking_rule = True#(season <= 2 or season > 27)
+        use_ranking_rule = False#(season <= 2 or season > 27)
 
         # [修改] 调用蒙特卡洛函数，传入 use_ranking_rule
         death_counts, avg_scores = self._mc_func(
@@ -521,6 +522,16 @@ class BayesianEloEstimator:
         ci_lower = np.percentile(boot_probs, 2.5)
         ci_upper = np.percentile(boot_probs, 97.5)
         
+        # [新增] 3.5 估计得票率 (Fan Vote) 的 95% 置信区间
+        # 基于模型设定的 noise_std，通过蒙特卡洛采样生成所有选手的得票率分布
+        # 这里的 2000 次采样足以获得极其精确的置信区间分位数
+        f_samples = f_pct * np.random.normal(1.0, self.noise_std, (2000, n))
+        f_samples /= f_samples.sum(axis=1, keepdims=True) # 归一化处理
+        
+        # 计算所有选手得票率的 2.5% 和 97.5% 分位数 (axis=0 表示对每一列即每个选手计算)
+        f_ci_low_array = np.percentile(f_samples, 2.5, axis=0)
+        f_ci_high_array = np.percentile(f_samples, 97.5, axis=0)
+        
         # 4. KL 散度 (与均匀分布的距离)，使用对称化的JS散度
         uniform = np.ones(n) / n
         # 使用 JS 散度 (对称且有界 [0, 1])
@@ -548,6 +559,8 @@ class BayesianEloEstimator:
             'certainty': certainty,
             'ci_lower': ci_lower,
             'ci_upper': ci_upper,
+            'f_ci_lower': f_ci_low_array,   # [新增] 存储全员粉丝票下界数组
+            'f_ci_upper': f_ci_high_array,
             'kl_divergence': kl_normalized,
             'effective_sample_size': ess_normalized,
             'rule_used': 'rank' if use_ranking_rule else 'percent' # <--- 新增记录
@@ -567,7 +580,7 @@ class BayesianEloEstimator:
         current_elos = self.get_elos_array(names)
         current_rds = self.get_rds_array(names)
         
-        use_ranking_rule = True#(season <= 2 or season > 27)
+        use_ranking_rule = False#(season <= 2 or season > 27)
         
         if NUMBA_AVAILABLE:
             new_elos, new_rds = _bayesian_elo_update(
@@ -695,12 +708,15 @@ class BayesianEloEstimator:
                         'name': name,
                         'judge_pct': j_pct[i],
                         'est_fan_pct': f_pct[i],
+                        # [新增] 记录该选手粉丝投票率的 95% 置信区间
+                        'fan_pct_ci_lower': metrics['f_ci_lower'][i],
+                        'fan_pct_ci_upper': metrics['f_ci_upper'][i],
                         'elo_rating': contestant.elo,
                         'rating_deviation': contestant.rd,
                         'consistency_score': metrics['consistency'],
                         'certainty_score': metrics['certainty'],
-                        'ci_95_lower': metrics['ci_lower'],
-                        'ci_95_upper': metrics['ci_upper'],
+                        'eli_ci_95_lower': metrics['ci_lower'],
+                        'eli_ci_95_upper': metrics['ci_upper'],
                         'kl_divergence': metrics['kl_divergence'],
                         'effective_sample_size': metrics['effective_sample_size'],
                         'is_withdrew': is_withdrew,  # 主动退出标记
@@ -1414,7 +1430,7 @@ def main():
     elapsed = time.perf_counter() - start_time
     
     # 保存结果
-    output_file = 'QF‘s solution/Q2_bayes/Q2_1/rank_fan_vote_estimates_weekly.csv'
+    output_file = 'QF‘s solution/Q2_bayes/Q2_1/percent_fan_vote_estimates_weekly.csv'
     final_results.to_csv(output_file, index=False, float_format='%.6f')
     
     # 输出统计

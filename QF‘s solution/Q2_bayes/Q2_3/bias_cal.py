@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 from scipy.stats import spearmanr
-
+import seaborn as sns
+import matplotlib.pyplot as plt
 def calculate_method_bias(sim_file, raw_file, estimates_file):
     """
     计算不同投票机制下的决策一致性偏差 (Bias)
@@ -35,7 +36,7 @@ def calculate_method_bias(sim_file, raw_file, estimates_file):
     df = pd.merge(df, avg_ranks, left_on=['Name', 'Season'], right_on=['name', 'season'], how='inner')
 
     # 定义需要分析的模拟列（对应不同的淘汰周）
-    methods = ['Sim_Rank_NoSave', 'Sim_Pct_NoSave', 'Sim_Rank_Save', 'Sim_Pct_Save']
+    methods = ['Sim_Rank_NoSave', 'Sim_Pct_NoSave', 'Sim_Rank_Save']
     
     bias_results = []
 
@@ -90,3 +91,35 @@ if __name__ == "__main__":
     )
     print("各投票机制偏差汇总：")
     print(summary_report)
+
+    # 设置风格
+    sns.set_theme(style="whitegrid", font_scale=1.1)
+    plt.figure(figsize=(9, 6))
+
+    # 绘图
+    ax = sns.barplot(
+        data=summary_report,
+        x='Method',
+        y='Mean_Abs_Bias',
+        palette=['#2C7BB6']
+    )
+
+    # 添加数值标签
+    for p in ax.patches:
+        ax.annotate(format(p.get_height(), '.2f'), 
+                    (p.get_x() + p.get_width() / 2., p.get_height()), 
+                    ha = 'center', va = 'center', 
+                    xytext = (0, 9), 
+                    textcoords = 'offset points')
+
+    # 标题加粗
+    plt.title('Comparison of Mean Absolute Bias Among Methods', fontsize=14, fontweight='bold', pad=20)
+
+    plt.xlabel('Voting Mechanism', fontsize=12)
+    plt.ylabel('Mean Absolute Bias', fontsize=12)
+    plt.ylim(0, max(summary_report['Mean_Abs_Bias']) * 1.2) # 自动调整Y轴上限
+    plt.xticks(rotation=15)
+    plt.tight_layout()
+
+    # 保存
+    plt.savefig("QF‘s solution/Q2_bayes/Q2_3/bias_bar.png", dpi=300, bbox_inches='tight')
