@@ -339,7 +339,7 @@ class BayesianEloEstimator:
         base_k_factor: float = 48.0,
         temperature: float = 150.0,
         n_simulations: int = 3000,
-        noise_std: float = 0.30,
+        noise_std: float = 0.15,
         judge_weight: float = 0.4,
         rd_decay: float = 0.95,
         use_adaptive_params: bool = True,
@@ -1380,9 +1380,9 @@ def main():
     # 初始化模型
     estimator = BayesianEloEstimator(
         base_k_factor=48.0,
-        temperature=300.0,
+        temperature=150.0,
         n_simulations=3000,
-        noise_std=0.15,
+        noise_std=0.3,
         judge_weight=0.5,
         rd_decay=0.95,
         use_adaptive_params=True,
@@ -1402,7 +1402,7 @@ def main():
     elapsed = time.perf_counter() - start_time
     
     # 保存结果
-    output_file = 'fan_vote_estimates_weekly.csv'
+    output_file = 'QF‘s solution/Bayes_Elo/fan_vote_estimates_weekly.csv'
     final_results.to_csv(output_file, index=False, float_format='%.6f')
     
     # 输出统计
