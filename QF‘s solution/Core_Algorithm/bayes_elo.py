@@ -453,7 +453,7 @@ class BayesianEloEstimator:
         else:
             f_pct = f_pct / f_pct.sum()
         
-        use_ranking_rule = False#(season <= 2 or season > 27)
+        use_ranking_rule = (season <= 2 or season > 27)
 
         # [修改] 调用蒙特卡洛函数，传入 use_ranking_rule
         death_counts, avg_scores = self._mc_func(
@@ -1323,7 +1323,7 @@ class EloVisualizer:
         self.plot_elo_trajectories(top_n=12)
         
         # 2. 最近3个赛季的单独 ELO 轨迹图
-        seasons = sorted(self.results['season'].unique())[-3:]
+        seasons = sorted(self.results['season'].unique())[0:35]
         for s in seasons:
             self.plot_elo_by_season(s, top_n=8)
         
