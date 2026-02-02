@@ -25,7 +25,7 @@ for df in [df_percent, df_rank]:
 
 # 合并数据集进行对比分析
 common_cols = ['Contestant', 'season', 'week']
-val_cols = ['est_fan_pct', 'ci_95_lower', 'ci_95_upper']
+val_cols = ['est_fan_pct', 'fan_pct_ci_lower', 'fan_pct_ci_upper']
 
 df_merged = pd.merge(
     df_percent[common_cols + val_cols],
@@ -80,14 +80,14 @@ if not df_subset.empty:
     
     # 绘制 Percentage 规则下的估计
     plt.bar(x - width/2, df_subset['est_fan_pct_Percent'], width, 
-            yerr=[df_subset['est_fan_pct_Percent'] - df_subset['ci_95_lower_Percent'], 
-                  df_subset['ci_95_upper_Percent'] - df_subset['est_fan_pct_Percent']],
+            yerr=[df_subset['est_fan_pct_Percent'] - df_subset['fan_pct_ci_lower_Percent'], 
+                  df_subset['fan_pct_ci_upper_Percent'] - df_subset['est_fan_pct_Percent']],
             label='Mapping: Percentage Rule', color='#3498db', capsize=3, alpha=0.8,ecolor='black')
             
     # 绘制 Rank 规则下的估计
     plt.bar(x + width/2, df_subset['est_fan_pct_Rank'], width, 
-            yerr=[df_subset['est_fan_pct_Rank'] - df_subset['ci_95_lower_Rank'], 
-                  df_subset['ci_95_upper_Rank'] - df_subset['est_fan_pct_Rank']],
+            yerr=[df_subset['est_fan_pct_Rank'] - df_subset['fan_pct_ci_lower_Rank'], 
+                  df_subset['fan_pct_ci_upper_Rank'] - df_subset['est_fan_pct_Rank']],
             label='Mapping: Rank Rule', color='#e67e22', capsize=3, alpha=0.8,ecolor='black')
 
     plt.xticks(x, df_subset['Contestant'], rotation=30, ha='right')

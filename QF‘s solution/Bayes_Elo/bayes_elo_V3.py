@@ -466,7 +466,8 @@ class BayesianEloEstimator:
         else:
             f_pct = f_pct / f_pct.sum()
         
-        use_ranking_rule = False#(season <= 2 or season > 27)
+        use_ranking_rule =  (season <= 2 or season > 27)
+       
 
         # [修改] 调用蒙特卡洛函数，传入 use_ranking_rule
         death_counts, avg_scores = self._mc_func(
@@ -580,7 +581,7 @@ class BayesianEloEstimator:
         current_elos = self.get_elos_array(names)
         current_rds = self.get_rds_array(names)
         
-        use_ranking_rule = False#(season <= 2 or season > 27)
+        use_ranking_rule = (season <= 2 or season > 27)
         
         if NUMBA_AVAILABLE:
             new_elos, new_rds = _bayesian_elo_update(
@@ -1430,7 +1431,7 @@ def main():
     elapsed = time.perf_counter() - start_time
     
     # 保存结果
-    output_file = 'QF‘s solution/Q2_bayes/Q2_1/percent_fan_vote_estimates_weekly.csv'
+    output_file = 'QF‘s solution/Bayes_Elo/real_fan_vote_estimates_weekly.csv'    #27
     final_results.to_csv(output_file, index=False, float_format='%.6f')
     
     # 输出统计
@@ -1461,8 +1462,8 @@ def main():
     print(rankings.head(10).to_string(index=False))
     
     # 生成可视化
-    # visualizer = EloVisualizer(estimator, final_results)
-    # visualizer.generate_all_visualizations()
+    visualizer = EloVisualizer(estimator, final_results)
+    visualizer.generate_all_visualizations()
 
 
 if __name__ == "__main__":

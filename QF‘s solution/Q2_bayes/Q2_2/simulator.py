@@ -189,5 +189,5 @@ class DancingSimulator:
             return "Eliminated"
 
 # ================= 使用示例 =================
-sim = DancingSimulator('2026_MCM_Problem_C_Data.csv', 'QF‘s solution/Bayes_Elo/real_figures/fan_vote_estimates_weekly.csv')
+sim = DancingSimulator('2026_MCM_Problem_C_Data.csv', 'QF‘s solution/Bayes_Elo/real_figures/real_fan_vote_estimates_weekly.csv')
 

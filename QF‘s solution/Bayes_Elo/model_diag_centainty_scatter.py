@@ -4,7 +4,7 @@ import seaborn as sns
 import numpy as np
 
 # 1. 加载数据
-df = pd.read_csv('QF‘s solution/Bayes_Elo/real_figures/fan_vote_estimates_weekly.csv')
+df = pd.read_csv('QF‘s solution/Bayes_Elo/real_figures/real_fan_vote_estimates_weekly.csv')
 
 # 2. 聚合每周统计数据
 weekly_stats = df.groupby(['season', 'week']).agg(
